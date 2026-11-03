@@ -1,11 +1,11 @@
-# Imboni SAT Success Hub
+# Imboni SAT Hub
 
 > Simplified SAT prep and a peer community for students.
 
-Imboni SAT Success Hub helps students master the SAT through bite-sized "cheat codes" and a supportive peer forum.
+Imboni SAT Hub helps students master the SAT through bite-sized "cheat codes" and a supportive peer forum.
 
 ## Pages
 
-- [Home](/): Overview of Imboni SAT Success Hub and what the platform offers.
+- [Home](/): Overview of Imboni SAT Hub and what the platform offers.
 - [Impact](/impact): Mission, outcomes, and community impact.
 - [Join](/auth): Create an account or log in to access the full platform.
