@@ -14,16 +14,16 @@ import { generateContent, publishGeneratedContent } from "@/lib/admin-ai.functio
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Admin Panel — Imboni SAT Success Hub" }] }),
+  head: () => ({ meta: [{ title: "Control Center | Imboni SAT Hub" }] }),
   component: AdminPage,
 });
 
-type Tab = "resources" | "users" | "ai";
+type Tab = "overview" | "resources" | "users" | "ai";
 
 function AdminPage() {
   const { user } = Route.useRouteContext();
   const { data: isAdmin, isLoading } = useIsAdmin(user.id);
-  const [tab, setTab] = useState<Tab>("resources");
+  const [tab, setTab] = useState<Tab>("overview");
 
   if (isLoading) {
     return <div className="mx-auto max-w-7xl px-4 py-16 text-sm text-muted-foreground">Checking access…</div>;
@@ -33,10 +33,11 @@ function AdminPage() {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
         <ShieldAlert className="mx-auto h-10 w-10 text-muted-foreground" />
-        <h1 className="mt-4 font-display text-2xl font-semibold">Admin access required</h1>
+        <h1 className="mt-4 font-display text-2xl font-semibold">This page is for admins</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your account does not have the admin role. Ask the project owner to grant access.
+          You are signed in, but your account does not have admin access. If you help run Imboni, ask Aime Pascal to add you.
         </p>
+        <a href="/learn" className="mt-6 inline-flex h-11 items-center rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground">Back to learning</a>
       </div>
     );
   }
@@ -44,29 +45,190 @@ function AdminPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="max-w-2xl">
-        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Admin Panel</h1>
-        <p className="mt-2 text-muted-foreground">Manage the Cheat Code Vault and community content.</p>
+        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Control Center</h1>
+        <p className="mt-2 text-muted-foreground">Visitors, students and content for Imboni SAT Hub.</p>
       </div>
 
       <div className="mt-8 flex gap-1 rounded-lg border border-border bg-surface p-1 w-fit flex-wrap">
-        {(["resources", "users", "ai"] as Tab[]).map((t) => (
+        {(["overview", "resources", "users", "ai"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition ${tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
-            {t === "resources" ? "Cheat Codes" : t === "users" ? "Users & Roles" : "AI Copilot"}
+            {t === "overview" ? "Overview" : t === "resources" ? "Old Vault resources" : t === "users" ? "Users & Roles" : "AI Copilot"}
           </button>
         ))}
       </div>
 
       <div className="mt-6">
+        {tab === "overview" && <Overview />}
         {tab === "resources" && <ResourcesAdmin authorId={user.id} />}
         {tab === "users" && <UsersAudit />}
         {tab === "ai" && <AiCopilot authorId={user.id} />}
       </div>
     </div>
   );
+}
+
+/* -------------------- OVERVIEW (visitor statistics) -------------------- */
+
+type Stats = {
+  visits: number;
+  visitors: number;
+  signups: number;
+  students: number;
+  active: number;
+  answered: number;
+  per_day: { day: string; visits: number }[];
+  top_pages: { name: string; n: number }[];
+  devices: { name: string; n: number }[];
+  sources: { name: string; n: number }[];
+};
+
+const RANGES = [
+  { days: 1, label: "Today" },
+  { days: 7, label: "7 days" },
+  { days: 30, label: "30 days" },
+  { days: 90, label: "90 days" },
+];
+
+function Overview() {
+  const [days, setDays] = useState(30);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["admin-stats", days],
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as unknown as (fn: string, args: object) => Promise<{ data: Stats | null; error: Error | null }>)(
+        "admin_stats",
+        { days },
+      );
+      if (error) throw error;
+      return data as Stats;
+    },
+  });
+
+  const cards = data
+    ? [
+        { label: "Visitors", value: data.visitors, sub: `${data.visits.toLocaleString()} page views` },
+        { label: "New sign-ups", value: data.signups, sub: `${data.students.toLocaleString()} students in total` },
+        { label: "Active learners", value: data.active, sub: "Studied or practised" },
+        { label: "Questions answered", value: data.answered, sub: "In practice" },
+      ]
+    : [];
+  const max = Math.max(1, ...(data?.per_day ?? []).map((d) => d.visits));
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex rounded-lg border border-border bg-card p-0.5" role="group" aria-label="Date range">
+          {RANGES.map((r) => (
+            <button
+              key={r.days}
+              type="button"
+              onClick={() => setDays(r.days)}
+              aria-pressed={days === r.days}
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold ${days === r.days ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+        {data && (
+          <Button variant="outline" size="sm" onClick={() => downloadCsv(data, days)}>
+            Export CSV
+          </Button>
+        )}
+      </div>
+
+      {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {error && (
+        <div className="rounded-xl border border-dashed border-border-strong bg-card p-6 text-sm text-muted-foreground">
+          Statistics are not switched on yet. Run the database update
+          <code className="mx-1 rounded bg-muted px-1">20261103120000_page_views_and_admin_stats.sql</code>
+          in Supabase, then reload this page.
+        </div>
+      )}
+
+      {data && (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {cards.map((c) => (
+              <div key={c.label} className="rounded-xl border border-border bg-card p-5">
+                <p className="text-sm text-muted-foreground">{c.label}</p>
+                <p className="mt-1 font-display text-3xl font-bold">{c.value.toLocaleString()}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{c.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h2 className="font-display text-lg font-bold">Visits per day</h2>
+            {data.per_day.length === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">No visits recorded yet in this period.</p>
+            ) : (
+              <div className="mt-4 flex h-48 items-end gap-1 border-b border-border" role="img" aria-label="Bar chart of visits per day">
+                {data.per_day.map((d) => (
+                  <div
+                    key={d.day}
+                    title={`${d.day}: ${d.visits} visits`}
+                    className="min-w-[4px] flex-1 rounded-t bg-primary/70 hover:bg-primary"
+                    style={{ height: `${Math.max(2, Math.round((d.visits / max) * 100))}%` }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            <StatList title="Top pages" rows={data.top_pages} />
+            <StatList title="Phone, tablet or computer" rows={data.devices} />
+            <StatList title="Where visitors come from" rows={data.sources} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function StatList({ title, rows }: { title: string; rows: { name: string; n: number }[] }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="font-display text-base font-bold">{title}</h3>
+      {rows.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Nothing yet.</p>
+      ) : (
+        <ul className="mt-3 space-y-2 text-sm">
+          {rows.map((r) => (
+            <li key={r.name} className="flex justify-between gap-3">
+              <span className="truncate">{r.name}</span>
+              <b>{r.n.toLocaleString()}</b>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function downloadCsv(s: Stats, days: number) {
+  const lines = [
+    "section,name,value",
+    `summary,visitors,${s.visitors}`,
+    `summary,page views,${s.visits}`,
+    `summary,new sign-ups,${s.signups}`,
+    `summary,active learners,${s.active}`,
+    `summary,questions answered,${s.answered}`,
+    ...s.per_day.map((d) => `day,${d.day},${d.visits}`),
+    ...s.top_pages.map((r) => `page,"${r.name.replace(/"/g, '""')}",${r.n}`),
+    ...s.devices.map((r) => `device,${r.name},${r.n}`),
+    ...s.sources.map((r) => `source,"${r.name.replace(/"/g, '""')}",${r.n}`),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `imboni-sat-hub-stats-${days}-days.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 /* -------------------- RESOURCES -------------------- */

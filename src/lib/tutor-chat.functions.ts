@@ -17,7 +17,7 @@ const chatInputSchema = z.object({
   history: z.array(chatMessageSchema).max(20).default([]),
 });
 
-const SYSTEM_PROMPT = `You are the Imboni SAT Success Hub AI Tutor, a warm and encouraging SAT prep coach built into the Imboni SAT Success Hub app.
+const SYSTEM_PROMPT = `You are the Imboni SAT Hub AI Tutor, a warm and encouraging SAT prep coach built into the Imboni SAT Hub app.
 
 Your job:
 - Help students understand SAT Math, Reading, and Writing concepts.

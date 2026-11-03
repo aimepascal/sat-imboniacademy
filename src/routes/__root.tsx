@@ -12,12 +12,13 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { AITutorChat } from "@/components/AITutorChat";
 import { supabase } from "@/integrations/supabase/client";
 import { registerAppServiceWorker } from "@/lib/pwa";
+import { trackPageView } from "@/lib/track";
+import { PrivacyNotice } from "@/components/PrivacyNotice";
+import { useLocation } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
@@ -41,9 +42,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -64,15 +62,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Imboni SAT Success Hub" },
-      { name: "description", content: "Simplified SAT prep and a peer community for students." },
-      { property: "og:description", content: "Simplified SAT prep and a peer community for students." },
-      { name: "twitter:description", content: "Simplified SAT prep and a peer community for students." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/742e5331-2411-4fea-bcc2-f578db57a44a" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/742e5331-2411-4fea-bcc2-f578db57a44a" },
+      { title: "Imboni SAT Hub" },
+      { name: "description", content: "Free SAT lessons, practice and a student community, by Aime Pascal at Imboni Academy." },
+      { property: "og:description", content: "Free SAT lessons, practice and a student community, by Aime Pascal at Imboni Academy." },
+      { property: "og:title", content: "Imboni SAT Hub" },
+      { name: "twitter:description", content: "Free SAT lessons, practice and a student community, by Aime Pascal at Imboni Academy." },
+      { property: "og:image", content: "https://sat.imboniacademy.org/og-image.png" },
+      { name: "twitter:image", content: "https://sat.imboniacademy.org/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
-      { name: "theme-color", content: "#123a63" },
+      { name: "theme-color", content: "#10508a" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
@@ -109,6 +108,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthSync />
       <ServiceWorkerRegistrar />
+      <VisitCounter />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
@@ -116,10 +116,20 @@ function RootComponent() {
         </main>
         <SiteFooter />
       </div>
-      <AITutorChat />
+      {/* The floating "AI tutor" button was removed: it covered content on phones.
+          Its code is still in src/components/AITutorChat.tsx if you want it back. */}
+      <PrivacyNotice />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
+}
+
+function VisitCounter() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    void trackPageView(pathname);
+  }, [pathname]);
+  return null;
 }
 
 function ServiceWorkerRegistrar() {

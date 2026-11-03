@@ -21,7 +21,7 @@ import {
 
 // Staff-only screen, so its text is in English and not in the dictionaries.
 export const Route = createFileRoute("/_authenticated/review-desk")({
-  head: () => ({ meta: [{ title: "Review desk — Imboni SAT Success Hub" }] }),
+  head: () => ({ meta: [{ title: "Review desk | Imboni SAT Hub" }] }),
   component: ReviewDesk,
 });
 

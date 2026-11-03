@@ -17,13 +17,13 @@ export const Route = createFileRoute("/auth")({
   validateSearch: authSearchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in — Imboni SAT Success Hub" },
-      { name: "description", content: "Join the Imboni SAT Success Hub community. Free forever for students." },
-      { property: "og:title", content: "Join Imboni SAT Success Hub" },
+      { title: "Sign in | Imboni SAT Hub" },
+      { name: "description", content: "Join the Imboni SAT Hub community. Free forever for students." },
+      { property: "og:title", content: "Join Imboni SAT Hub" },
       { property: "og:description", content: "Sign in or create a free account to unlock SAT cheat codes and peer threads." },
-      { property: "og:url", content: "https://sat-success-hub.lovable.app/auth" },
+      { property: "og:url", content: "https://sat.imboniacademy.org/auth" },
     ],
-    links: [{ rel: "canonical", href: "https://sat-success-hub.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://sat.imboniacademy.org/auth" }],
   }),
   component: AuthPage,
 });
@@ -126,7 +126,7 @@ function AuthPage() {
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Sparkles className="h-4 w-4" />
             </span>
-            Imboni SAT Success Hub
+            Imboni SAT Hub
           </a>
         </div>
 

@@ -6,18 +6,20 @@ import { redirect } from "@tanstack/react-router";
 // (/learn is a static page, not a router route).
 export const LEARN_PATH = "/learn";
 
-export function redirectToLearn(status: 301 | 302) {
+// `section` opens one part of /learn, e.g. "library" -> /learn#library.
+export function redirectToLearn(status: 301 | 302, section?: string) {
+  const hash = section ? `#${section}` : "";
   return {
     server: {
       handlers: {
         GET: ({ request }: { request: Request }) => {
           const { search } = new URL(request.url);
-          return new Response(null, { status, headers: { location: LEARN_PATH + search } });
+          return new Response(null, { status, headers: { location: LEARN_PATH + search + hash } });
         },
       },
     },
     beforeLoad: () => {
-      throw redirect({ href: LEARN_PATH, reloadDocument: true });
+      throw redirect({ href: LEARN_PATH + hash, reloadDocument: true });
     },
   };
 }

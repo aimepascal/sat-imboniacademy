@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as LearnRouteImport } from './routes/learn'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VaultRouteImport } from './routes/vault'
@@ -59,6 +60,11 @@ const ImpactRoute = ImpactRouteImport.update({
 const LearnRoute = LearnRouteImport.update({
   id: '/learn',
   path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/forum': typeof ForumRoute
   '/impact': typeof ImpactRoute
   '/learn': typeof LearnRoute
+  '/library': typeof LibraryRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/vault': typeof VaultRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/forum': typeof ForumRoute
   '/impact': typeof ImpactRoute
   '/learn': typeof LearnRoute
+  '/library': typeof LibraryRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/vault': typeof VaultRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/forum': typeof ForumRoute
   '/impact': typeof ImpactRoute
   '/learn': typeof LearnRoute
+  '/library': typeof LibraryRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/vault': typeof VaultRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/impact'
     | '/learn'
+    | '/library'
     | '/privacy'
     | '/terms'
     | '/vault'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/impact'
     | '/learn'
+    | '/library'
     | '/privacy'
     | '/terms'
     | '/vault'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/impact'
     | '/learn'
+    | '/library'
     | '/privacy'
     | '/terms'
     | '/vault'
@@ -234,6 +246,7 @@ export interface RootRouteChildren {
   ForumRoute: typeof ForumRoute
   ImpactRoute: typeof ImpactRoute
   LearnRoute: typeof LearnRoute
+  LibraryRoute: typeof LibraryRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   VaultRoute: typeof VaultRoute
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/learn'
       fullPath: '/learn'
       preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -392,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForumRoute: ForumRoute,
   ImpactRoute: ImpactRoute,
   LearnRoute: LearnRoute,
+  LibraryRoute: LibraryRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   VaultRoute: VaultRoute,

@@ -3,8 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Imboni SAT Success Hub" },
-      { name: "description", content: "How Imboni SAT Success Hub uses your name and email." },
+      { title: "Privacy Policy | Imboni SAT Hub" },
+      { name: "description", content: "How Imboni SAT Hub uses your name and email." },
     ],
   }),
   component: PrivacyPage,
@@ -14,7 +14,7 @@ function PrivacyPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Privacy Policy</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Imboni SAT Success Hub. Last updated October 2026.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Imboni SAT Hub. Last updated November 2026.</p>
       <div className="mt-8 space-y-6">
           <section>
             <h2 className="font-display text-xl font-bold">What we collect</h2>
@@ -22,7 +22,11 @@ function PrivacyPage() {
           </section>
           <section>
             <h2 className="font-display text-xl font-bold">Why we use it</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Only to sign you in, save your account, and let you take part in the forum. Lesson progress is saved on your own device.</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">To sign you in, save your account and your lesson and practice progress, and let you take part in the forum.</p>
+          </section>
+          <section>
+            <h2 className="font-display text-xl font-bold">Counting visits</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">To see which lessons help most, we count page visits. For each visit we store the page, the website you came from, whether you use a phone, tablet or computer, the site language, and a random visit number kept in your browser. If you are signed in, the visit is linked to your account. We do not store your IP address. Only Imboni admins can see these numbers.</p>
           </section>
           <section>
             <h2 className="font-display text-xl font-bold">What we never do</h2>

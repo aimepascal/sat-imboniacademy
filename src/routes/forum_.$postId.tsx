@@ -36,7 +36,7 @@ export const Route = createFileRoute("/forum_/$postId")({
     };
   },
   head: ({ loaderData, params }) => {
-    const url = `https://sat-success-hub.lovable.app/forum/${params?.postId}`;
+    const url = `https://sat.imboniacademy.org/forum/${params?.postId}`;
     const qaSchema = loaderData
       ? {
           "@context": "https://schema.org",
@@ -61,10 +61,10 @@ export const Route = createFileRoute("/forum_/$postId")({
       : null;
     return {
       meta: [
-        { title: `${loaderData?.title ?? "Thread"} — Imboni SAT Success Hub Forum` },
-        { name: "description", content: loaderData?.excerpt || "A peer discussion thread on the Imboni SAT Success Hub forum." },
-        { property: "og:title", content: loaderData?.title ?? "Imboni SAT Success Hub Forum Thread" },
-        { property: "og:description", content: loaderData?.excerpt || "A peer discussion thread on the Imboni SAT Success Hub forum." },
+        { title: `${loaderData?.title ?? "Thread"} | Imboni SAT Hub Forum` },
+        { name: "description", content: loaderData?.excerpt || "A peer discussion thread on the Imboni SAT Hub forum." },
+        { property: "og:title", content: loaderData?.title ?? "Imboni SAT Hub Forum Thread" },
+        { property: "og:description", content: loaderData?.excerpt || "A peer discussion thread on the Imboni SAT Hub forum." },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
       ],

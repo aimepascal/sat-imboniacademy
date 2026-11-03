@@ -2,7 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { canReviewQuestions, useRoles } from "@/hooks/use-roles";
 import { LANGUAGES, setLanguage, useI18n, type Language } from "@/lib/i18n";
@@ -10,16 +18,34 @@ import { learningDb } from "@/lib/learning/db";
 import { LEARN_PATH } from "@/lib/learn-redirect";
 import logoUrl from "@/assets/logo.png";
 
+// One compact bar (56px) on every page.
+// Main links: Learn, Practice, Library, Cheat codes, Community.
+// Signed in: an account menu with Today's plan, Review desk, Control Center and Sign out.
 export function SiteHeader() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string>("");
   const [open, setOpen] = useState(false);
   const { data: isAdmin } = useIsAdmin(userId);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setUserId(s?.user.id ?? null));
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user.id ?? null);
+      setEmail(data.session?.user.email ?? "");
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setUserId(s?.user.id ?? null);
+      setEmail(s?.user.email ?? "");
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  // Close the phone menu with Escape.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -53,80 +79,115 @@ export function SiteHeader() {
     </div>
   );
 
-  const navLinks = [
-    ...(userId ? [{ to: "/today", label: t("nav.today") }] : []),
-    { to: "/forum", label: "Forum" },
-    { to: "/impact", label: "Impact" },
-    ...(canReviewQuestions(roles) ? [{ to: "/review-desk", label: t("nav.reviewDesk") }] : []),
-    ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
+  // /learn is a static page in public/learn, so these are plain links.
+  const mainLinks: { href: string; label: string }[] = [
+    { href: LEARN_PATH, label: "Learn" },
+    { href: userId ? "/practice" : `${LEARN_PATH}#practice`, label: t("nav.practice") },
+    { href: `${LEARN_PATH}#library`, label: "Library" },
+    { href: `${LEARN_PATH}#codes`, label: "Cheat codes" },
+    { href: "/forum", label: "Community" },
   ];
 
+  const accountLinks: { to: string; label: string }[] = [
+    { to: "/today", label: "Today's plan" },
+    ...(canReviewQuestions(roles) ? [{ to: "/review-desk", label: t("nav.reviewDesk") }] : []),
+    ...(isAdmin ? [{ to: "/admin", label: "Control Center" }] : []),
+  ];
+
+  const initials = (email.split("@")[0] || "?").slice(0, 2).toUpperCase();
+  const linkClass =
+    "rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground";
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <a href={LEARN_PATH} className="flex items-center gap-2 font-display text-base font-semibold tracking-tight" aria-label="Imboni SAT Success Hub home">
-          <img src={logoUrl} alt="" width={32} height={32} className="h-8 w-8" />
-          <span>Imboni SAT Success Hub</span>
+    <header className="sticky top-0 z-40 border-b border-border bg-background">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
+        <a href={LEARN_PATH} className="flex items-center gap-2 font-display text-base font-bold tracking-tight" aria-label="Imboni SAT Hub home">
+          <img src={logoUrl} alt="" width={30} height={30} className="h-[30px] w-[30px]" />
+          <span>Imboni SAT Hub</span>
         </a>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {/* /learn is a static page in public/learn, so a plain link, not <Link>. */}
-          <a
-            href={LEARN_PATH}
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
-          >
-            Learn
-          </a>
-          {navLinks.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
-              activeProps={{ className: "bg-muted text-foreground" }}
-            >
+        <nav className="ml-2 hidden items-center gap-0.5 lg:flex" aria-label="Main">
+          {mainLinks.map((l) => (
+            <a key={l.label} href={l.href} className={linkClass}>
               {l.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="ml-auto hidden items-center gap-2 lg:flex">
           {languageSwitch}
           {userId ? (
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>Sign out</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-card pl-1 pr-2"
+                  aria-label="Account menu"
+                >
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{initials}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="truncate font-normal text-muted-foreground">{email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {accountLinks.map((l) => (
+                  <DropdownMenuItem key={l.to} asChild>
+                    <Link to={l.to}>{l.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem asChild>
+                  <a href={`${LEARN_PATH}#mine`}>My learning</a>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleSignOut} className="text-destructive">
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
-              <Button variant="ghost" size="sm" asChild><Link to="/auth">Log in</Link></Button>
-              <Button size="sm" asChild><Link to="/auth" search={{ mode: "signup" }}>Join free</Link></Button>
+              <Link to="/auth" className="px-2 text-sm font-medium hover:text-primary">Log in</Link>
+              <Button size="sm" asChild><Link to="/auth" search={{ mode: "signup" }}>Start free</Link></Button>
             </>
           )}
         </div>
 
-        <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="menu">
+        <button
+          type="button"
+          className="ml-auto grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
+          onClick={() => setOpen(!open)}
+          aria-label={open ? "Close the menu" : "Open the menu"}
+          aria-expanded={open}
+        >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-border bg-background md:hidden">
-          <div className="flex flex-col px-4 py-3">
-            <div className="mb-2 self-start">{languageSwitch}</div>
-            <a href={LEARN_PATH} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
-              Learn
-            </a>
-            {navLinks.map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
+        <div className="fixed inset-x-0 bottom-0 top-14 z-40 overflow-y-auto bg-background lg:hidden">
+          <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Main">
+            {mainLinks.map((l) => (
+              <a key={l.label} href={l.href} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 font-display text-lg font-bold">
                 {l.label}
-              </Link>
+              </a>
             ))}
+            {userId &&
+              accountLinks.map((l) => (
+                <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 font-display text-lg font-bold text-primary">
+                  {l.label}
+                </Link>
+              ))}
+            <div className="mt-3 self-start">{languageSwitch}</div>
             {userId ? (
-              <Button variant="outline" size="sm" className="mt-2" onClick={handleSignOut}>Sign out</Button>
+              <Button variant="outline" className="mt-4 h-12" onClick={handleSignOut}>Sign out</Button>
             ) : (
-              <div className="mt-2 flex gap-2">
-                <Button variant="outline" size="sm" asChild className="flex-1"><Link to="/auth">Log in</Link></Button>
-                <Button size="sm" asChild className="flex-1"><Link to="/auth">Join</Link></Button>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild className="h-12"><Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)}>Start free</Link></Button>
+                <Button variant="outline" asChild className="h-12"><Link to="/auth" onClick={() => setOpen(false)}>Log in</Link></Button>
               </div>
             )}
-          </div>
+          </nav>
         </div>
       )}
     </header>

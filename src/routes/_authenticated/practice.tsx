@@ -12,7 +12,7 @@ import { learningDb, type AttemptInput, type Question } from "@/lib/learning/db"
 import { loadOrBuildTodayPlan } from "@/lib/learning/plan";
 
 export const Route = createFileRoute("/_authenticated/practice")({
-  head: () => ({ meta: [{ title: "Practice — Imboni SAT Success Hub" }] }),
+  head: () => ({ meta: [{ title: "Practice | Imboni SAT Hub" }] }),
   component: Practice,
 });
 

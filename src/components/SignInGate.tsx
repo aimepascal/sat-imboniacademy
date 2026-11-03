@@ -14,7 +14,7 @@ export function SignInGate({ action }: { action: string }) {
         </span>
         <div>
           <p className="font-display text-base">Create a free account to {action}.</p>
-          <p className="text-xs text-muted-foreground">Takes 20 seconds. No card. No spam.</p>
+          <p className="text-xs text-muted-foreground">Free. It takes a minute.</p>
         </div>
       </div>
       <div className="flex gap-2">

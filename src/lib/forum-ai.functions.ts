@@ -8,7 +8,7 @@ const inputSchema = z.object({
   postId: z.string().uuid(),
 });
 
-const SYSTEM_PROMPT = `You are the Imboni SAT Success Hub AI Tutor. You're replying directly inside a student's forum thread, right under their question, as the very first response.
+const SYSTEM_PROMPT = `You are the Imboni SAT Hub AI Tutor. You're replying directly inside a student's forum thread, right under their question, as the very first response.
 
 Your job:
 - Actually answer/solve the question. If it's a Math problem, work through it step by step and give the final answer clearly. If it's a Reading or Writing question, explain the correct choice and why the others are wrong.

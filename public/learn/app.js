@@ -235,5 +235,14 @@ $("q").addEventListener("input",lib);
 if(sb){sb.auth.getSession().then(function(r){setUser(r.data.session?r.data.session.user:null)});sb.auth.onAuthStateChange(function(_e,s){var u=s?s.user:null;if((u&&u.id)!==(state.user&&state.user.id))setTimeout(function(){setUser(u)},0)})}
 forumList();
 var qn=0;window.CONTENT.forEach(function(c){qn+=c.practice.length});$("stq").textContent=qn;
-legend($("legend1"));legend($("legend2"));legend($("legend3"));hmap();side();who();go("home");
+legend($("legend1"));legend($("legend2"));legend($("legend3"));hmap();side();who();(function(){var h=(location.hash||"").slice(1);go(["library","codes","practice","impact","tutors","mine"].indexOf(h)>=0?h:"home")})();
+/* Visit counting for the Control Center: same rules as src/lib/track.ts (no names, no emails) */
+var lastTrack="";function track(path){if(!sb||path===lastTrack||/localhost|127\.0\.0\.1/.test(location.hostname))return;lastTrack=path;try{var k="imboni_visit_id",id=localStorage.getItem(k);if(!id){id=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2));localStorage.setItem(k,id)}var w=innerWidth,dev=w<700?"phone":(w<1100&&navigator.maxTouchPoints>0?"tablet":"computer"),ref=null;try{if(document.referrer){var h=new URL(document.referrer).hostname.replace(/^www\./,"");if(h!==location.hostname)ref=h.slice(0,200)}}catch(e){}sb.from("page_views").insert({path:path.slice(0,200),referrer:ref,device:dev,language:(document.documentElement.lang||"en").slice(0,10),session_id:id,user_id:state.user?state.user.id:null}).then(function(){},function(){})}catch(e){}}
+var _go=go;go=function(v){_go(v);track("/learn"+(v&&v!=="home"&&v!=="skill"&&v!=="code"?"#"+v:""))};track("/learn"+(location.hash&&location.hash!=="#home"?location.hash:""));
+(function(){var n=$("pnote");if(!n)return;var ok;try{ok=localStorage.getItem("imboni_privacy_ok")==="1"}catch(e){ok=true}n.hidden=ok;$("pnoteOk").onclick=function(){try{localStorage.setItem("imboni_privacy_ok","1")}catch(e){}n.hidden=true}})();
+/* Compact header: phone menu and SAT map drawer */
+function setMenu(open){var n=$("mainnav"),h=$("hamb");n.classList.toggle("open",open);h.setAttribute("aria-expanded",open?"true":"false");h.setAttribute("aria-label",open?"Close the menu":"Open the menu")}
+$("hamb").onclick=function(){setMenu(!$("mainnav").classList.contains("open"))};
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-go],[data-skill],#mapBtn");if(!t)return;if(t.id!=="mapBtn")$("side").classList.add("closed");setMenu(false)},true);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){setMenu(false);$("side").classList.add("closed")}});
 })();
