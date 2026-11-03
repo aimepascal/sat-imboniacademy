@@ -1,4 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { LEARN_PATH } from "@/lib/learn-redirect";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,20 +17,19 @@ export const Route = createFileRoute("/auth")({
   validateSearch: authSearchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in — Imboni SAT Success Hub" },
-      { name: "description", content: "Join the Imboni SAT Success Hub community. Free forever for students." },
-      { property: "og:title", content: "Join Imboni SAT Success Hub" },
+      { title: "Sign in | Imboni SAT Hub" },
+      { name: "description", content: "Join the Imboni SAT Hub community. Free forever for students." },
+      { property: "og:title", content: "Join Imboni SAT Hub" },
       { property: "og:description", content: "Sign in or create a free account to unlock SAT cheat codes and peer threads." },
-      { property: "og:url", content: "https://sat-success-hub.lovable.app/auth" },
+      { property: "og:url", content: "https://sat.imboniacademy.org/auth" },
     ],
-    links: [{ rel: "canonical", href: "https://sat-success-hub.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://sat.imboniacademy.org/auth" }],
   }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const search = Route.useSearch();
-  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup" | "forgot" | "reset">(search.mode ?? "login");
   const [showPw, setShowPw] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -64,7 +64,8 @@ function AuthPage() {
         const { error } = await supabase.auth.updateUser({ password: pw });
         if (error) throw error;
         toast.success("Password updated. You are signed in.");
-        navigate({ to: "/dashboard" });
+        // /learn is a static page, so a full page load, not navigate().
+        window.location.assign(LEARN_PATH);
       } else if (mode === "signup") {
         const schema = z.object({
           email: z.string().email().max(255),
@@ -76,18 +77,20 @@ function AuthPage() {
           email: data.email,
           password: data.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${LEARN_PATH}`,
             data: { display_name: data.displayName },
           },
         });
         if (error) throw error;
         toast.success("Account created! Welcome aboard.");
-        navigate({ to: "/dashboard" });
+        // /learn is a static page, so a full page load, not navigate().
+        window.location.assign(LEARN_PATH);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back.");
-        navigate({ to: "/dashboard" });
+        // /learn is a static page, so a full page load, not navigate().
+        window.location.assign(LEARN_PATH);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -106,7 +109,7 @@ function AuthPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${window.location.origin}${LEARN_PATH}`,
       },
     });
     if (error) {
@@ -119,12 +122,12 @@ function AuthPage() {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <Link to="/" className="inline-flex items-center gap-2 font-display text-lg font-semibold">
+          <a href={LEARN_PATH} className="inline-flex items-center gap-2 font-display text-lg font-semibold">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Sparkles className="h-4 w-4" />
             </span>
-            Imboni SAT Success Hub
-          </Link>
+            Imboni SAT Hub
+          </a>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-8 shadow-card">

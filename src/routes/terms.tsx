@@ -3,8 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Use — Imboni SAT Success Hub" },
-      { name: "description", content: "Simple terms for using Imboni SAT Success Hub." },
+      { title: "Terms of Use | Imboni SAT Hub" },
+      { name: "description", content: "Simple terms for using Imboni SAT Hub." },
     ],
   }),
   component: TermsPage,
@@ -14,11 +14,11 @@ function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Terms of Use</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Imboni SAT Success Hub. Last updated October 2026.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Imboni SAT Hub. Last updated October 2026.</p>
       <div className="mt-8 space-y-6">
           <section>
             <h2 className="font-display text-xl font-bold">Using the site</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Imboni SAT Success Hub is a free study site for students preparing for the SAT. Use it for learning, and be kind to other students in the forum.</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Imboni SAT Hub is a free study site for students preparing for the SAT. Use it for learning, and be kind to other students in the forum.</p>
           </section>
           <section>
             <h2 className="font-display text-xl font-bold">Our content</h2>

@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /today
+Disallow: /practice
+Disallow: /review-desk
+Disallow: /audit-logs
 
 Sitemap: https://sat.imboniacademy.org/sitemap.xml

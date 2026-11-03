@@ -11,7 +11,7 @@ import { learningDb } from "@/lib/learning/db";
 import { loadOrBuildTodayPlan, streakFromAttempts } from "@/lib/learning/plan";
 
 export const Route = createFileRoute("/_authenticated/today")({
-  head: () => ({ meta: [{ title: "Today — Imboni SAT Success Hub" }] }),
+  head: () => ({ meta: [{ title: "Today | Imboni SAT Hub" }] }),
   component: Today,
 });
 

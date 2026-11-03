@@ -18,26 +18,26 @@ import type { VideoAttachment } from "@/lib/forum-video";
 export const Route = createFileRoute("/forum")({
   head: () => ({
     meta: [
-      { title: "Peer Forum — Imboni SAT Success Hub" },
-      { name: "description", content: "Ask SAT questions, share screenshots and PDFs, and get clear peer-to-peer breakdowns from students who've solved them." },
-      { property: "og:title", content: "Imboni SAT Success Hub Peer Forum — Get unstuck on any SAT question" },
+      { title: "Peer Forum | Imboni SAT Hub" },
+      { name: "description", content: "Ask SAT questions with a photo or PDF, and get clear step-by-step answers from other students and tutors." },
+      { property: "og:title", content: "Imboni SAT Hub Peer Forum — Get unstuck on any SAT question" },
       { property: "og:description", content: "Post a screenshot or a PDF, get a peer-written breakdown. A focused community for students prepping for the SAT." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:url", content: "https://sat-success-hub.lovable.app/forum" },
+      { property: "og:url", content: "https://sat.imboniacademy.org/forum" },
     ],
-    links: [{ rel: "canonical", href: "https://sat-success-hub.lovable.app/forum" }],
+    links: [{ rel: "canonical", href: "https://sat.imboniacademy.org/forum" }],
     scripts: [
       {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Imboni SAT Success Hub Peer Forum",
-          url: "https://sat-success-hub.lovable.app/forum",
-          description: "Crowdsourced peer-to-peer breakdowns of tough SAT questions across Math, Reading, Writing, and strategy.",
+          name: "Imboni SAT Hub Peer Forum",
+          url: "https://sat.imboniacademy.org/forum",
+          description: "Students and tutors explain hard SAT questions in Math, Reading, Writing and strategy.",
           inLanguage: "en",
-          isPartOf: { "@id": "https://sat-success-hub.lovable.app/#website" },
+          isPartOf: { "@id": "https://sat.imboniacademy.org/#website" },
         }),
       },
     ],
@@ -126,21 +126,23 @@ function ForumPage() {
             <div className="max-w-xl">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Peer forum</p>
               <h1 className="mt-3 font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl">
-                Crowdsourced breakdowns
+                Ask. Answer. Learn together.
               </h1>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                Stuck on a question? Post it with a screenshot or a PDF. Peers walk you through it, step by step.
+                Stuck on a question? Post it with a photo or a PDF, and other students and tutors explain it step by step.
               </p>
-              <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm">
-                <div>
-                  <dt className="text-muted-foreground">Questions</dt>
-                  <dd className="font-display text-2xl">{posts.length}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">With breakdowns</dt>
-                  <dd className="font-display text-2xl">{answered}</dd>
-                </div>
-              </dl>
+              {posts.length >= 10 && (
+                <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                  <div>
+                    <dt className="text-muted-foreground">Questions</dt>
+                    <dd className="font-display text-2xl">{posts.length}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">Answered</dt>
+                    <dd className="font-display text-2xl">{answered}</dd>
+                  </div>
+                </dl>
+              )}
             </div>
             {userId ? (
               <Button size="lg" onClick={() => setShowForm(!showForm)}>
