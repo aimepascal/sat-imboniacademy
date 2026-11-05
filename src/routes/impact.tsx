@@ -1,110 +1,79 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, MessageSquare, TrendingUp, BookOpen } from "lucide-react";
+import aime from "@/assets/aime.jpg";
 
 export const Route = createFileRoute("/impact")({
   head: () => ({
     meta: [
       { title: "Impact | Imboni SAT Hub" },
-      { name: "description", content: "What the Imboni SAT Hub community has built so far: students learning, questions answered and lessons shared." },
-      { property: "og:title", content: "Impact | Imboni SAT Hub" },
-      { property: "og:description", content: "Real numbers from the Imboni SAT Hub community in Kigali and beyond." },
-      { property: "og:url", content: "https://sat.imboniacademy.org/impact" },
+      { name: "description", content: "Free SAT prep, built in Kigali: what is on the Hub today and why it is free." },
     ],
     links: [{ rel: "canonical", href: "https://sat.imboniacademy.org/impact" }],
   }),
-  component: ImpactPage,
+  component: Impact,
 });
 
-// A number is only shown once it is big enough to mean something.
+// Student numbers appear once they are big enough to mean something.
 const MIN_TO_SHOW = 10;
 
-function ImpactPage() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["impact"],
-    queryFn: async () => {
-      const [scholars, posts, replies, comments, avgRpc] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("forum_posts").select("*", { count: "exact", head: true }),
-        supabase.from("forum_replies").select("*", { count: "exact", head: true }),
-        supabase.from("resource_comments").select("*", { count: "exact", head: true }),
-        supabase.rpc("get_avg_score_improvement"),
-      ]);
+interface ImpactData { lessons: number; questions: number; codes: number; guides: number; students: number; answers: number; questions_asked: number; answers_given: number }
 
-      // Only real data: no made-up average when students have not reported scores.
-      const avg = typeof avgRpc.data === "number" && avgRpc.data > 0 ? Math.round(avgRpc.data) : null;
-
-      return {
-        scholars: scholars.count ?? 0,
-        peerSolutions: (posts.count ?? 0) + (replies.count ?? 0) + (comments.count ?? 0),
-        avgImprovement: avg,
-      };
+function Impact() {
+  const { data } = useQuery({
+    queryKey: ["public-impact"],
+    queryFn: async (): Promise<ImpactData | null> => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any).rpc("public_impact");
+      return data ?? null;
     },
   });
-
-  const metrics = [
-    {
-      icon: Users,
-      label: "Students learning",
-      value: data && data.scholars >= MIN_TO_SHOW ? data.scholars.toLocaleString() : null,
-      sub: "Free accounts on the Hub",
-      accent: "text-primary",
-    },
-    {
-      icon: MessageSquare,
-      label: "Answers shared",
-      value: data && data.peerSolutions >= MIN_TO_SHOW ? data.peerSolutions.toLocaleString() : null,
-      sub: "Forum questions, replies and comments",
-      accent: "text-primary",
-    },
-    {
-      icon: TrendingUp,
-      label: "Average score increase",
-      value: data?.avgImprovement ? `+${data.avgImprovement}` : null,
-      sub: "From scores students reported before and after",
-      accent: "text-success",
-    },
-  ].filter((m) => m.value !== null);
+  const content = data
+    ? [[data.lessons, "lessons"], [data.questions, "practice questions"], [data.codes, "cheat codes"], [data.guides, "guides in the library"]]
+    : [];
+  const people = data
+    ? ([[data.students, "students with an account"], [data.answers, "practice answers"], [data.questions_asked, "questions asked in the community"]] as [number, string][]).filter(([n]) => n >= MIN_TO_SHOW)
+    : [];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-      <div className="max-w-3xl">
-        <p className="text-sm font-semibold uppercase tracking-wider text-primary">Impact</p>
-        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">What we are building together</h1>
-        <p className="mt-5 text-lg text-muted-foreground">
-          The Hub is free. These numbers come straight from the site and update on their own.
-        </p>
-      </div>
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Impact</p>
+      <h1 className="mt-1 text-3xl font-bold tracking-tight">Free SAT prep, built in Kigali</h1>
+      <p className="mt-2 text-muted-foreground">What is on the Hub today. Student numbers appear here once there are enough to share. They come straight from the site.</p>
 
-      {isLoading ? (
-        <p className="mt-12 text-muted-foreground">Loading…</p>
-      ) : metrics.length > 0 ? (
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {metrics.map((m) => (
-            <div key={m.label} className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              <m.icon className={`h-6 w-6 ${m.accent}`} />
-              <p className="mt-6 font-display text-5xl font-bold tracking-tight">{m.value}</p>
-              <p className="mt-3 text-sm font-medium text-foreground">{m.label}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{m.sub}</p>
-            </div>
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {content.map(([n, l]) => (
+          <div key={l as string} className="rounded-2xl border border-border bg-card p-4">
+            <b className="block text-3xl tracking-tight">{(n as number).toLocaleString()}</b>
+            <span className="text-sm text-muted-foreground">{l}</span>
+          </div>
+        ))}
+        {!data && <p className="col-span-full text-muted-foreground">Loading…</p>}
+      </div>
+      {people.length > 0 && (
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {people.map(([n, l]) => (
+            <div key={l} className="rounded-2xl bg-secondary p-4"><b className="block text-2xl">{n.toLocaleString()}</b><span className="text-sm text-muted-foreground">{l}</span></div>
           ))}
-        </div>
-      ) : (
-        <div className="mt-12 rounded-2xl border border-dashed border-border-strong bg-card p-8">
-          <p className="font-medium text-foreground">We are just getting started.</p>
-          <p className="mt-1 text-muted-foreground">Numbers will appear here as more students join and share answers.</p>
         </div>
       )}
 
-      <div className="mt-14 rounded-2xl border border-border bg-surface-elevated p-8 sm:p-12">
-        <BookOpen className="h-6 w-6 text-primary" />
-        <h2 className="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl">Why the Hub is free</h2>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Many students in Rwanda cannot pay for an SAT course. I started Imboni so that anyone who wants to study has
-          lessons, practice and people to ask, at no cost. Aime Pascal, founder of Imboni Academy.
-        </p>
+      <div className="mt-6 flex gap-4 rounded-2xl border border-border bg-card p-5">
+        <img src={aime} alt="Aime Pascal" width={56} height={56} className="h-14 w-14 flex-none rounded-full object-cover object-top" />
+        <div className="text-[15px] leading-relaxed">
+          <b>Why it is free</b>
+          <p className="mt-1">Many students in Rwanda cannot pay for an SAT course. I started Imboni so that anyone who wants to study has lessons, practice and people to ask, at no cost.</p>
+          <p className="mt-1 text-muted-foreground">Aime Pascal, founder of Imboni Academy</p>
+        </div>
       </div>
+
+      <div className="mt-3 rounded-2xl bg-primary p-5 text-primary-foreground">
+        <b className="text-lg">Help keep it free</b>
+        <p className="mt-1 text-primary-foreground/80">Your gift pays for hosting and new lessons.</p>
+        <a href="https://imboniacademy.org/donate" className="mt-3 inline-block h-11 rounded-xl bg-white px-5 font-bold leading-[44px] text-primary">Donate</a>
+      </div>
+
+      <p className="mt-6 text-sm text-muted-foreground">Did the Hub help you? Tell your story in the <Link to="/forum" className="font-semibold text-primary underline">community</Link>. Aime reads every message.</p>
     </div>
   );
 }

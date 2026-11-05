@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import { toast } from "sonner";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { SignInGate } from "@/components/SignInGate";
 import { AttachmentPicker } from "@/components/AttachmentPicker";
-import { generateForumAiReply } from "@/lib/forum-ai.functions";
 import type { FileAttachment } from "@/lib/forum-attachments";
 import type { VideoAttachment } from "@/lib/forum-video";
 
@@ -45,7 +43,7 @@ export const Route = createFileRoute("/forum")({
   component: ForumPage,
 });
 
-const TOPICS = ["General", "Math", "Reading", "Writing", "Strategy"];
+const TOPICS = ["Math", "Reading and Writing", "Strategy", "Applications", "General"];
 const FILTERS = ["All", ...TOPICS];
 
 function initials(name: string) {
@@ -124,7 +122,7 @@ function ForumPage() {
           />
           <div className="relative flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Peer forum</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Community</p>
               <h1 className="mt-3 font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl">
                 Ask. Answer. Learn together.
               </h1>
@@ -272,8 +270,28 @@ function ForumPage() {
           );
         })}
         {visible.length === 0 && (
-          <li className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground lg:col-span-2">
-            {posts.length === 0 ? "No questions yet. Be the first to start the conversation." : "Nothing matches that search."}
+          <li className="rounded-2xl border border-border bg-card p-6 lg:col-span-2">
+            {posts.length === 0 ? (
+              <>
+                <b className="text-lg">Be the first to ask</b>
+                <p className="mt-1 text-sm text-muted-foreground">Stuck on a practice question, a lesson, or your study plan? Ask here. Tutors and other students answer, and the best answer is marked for everyone.</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Math", "Why is the answer B on question 7 of Proportions? I got 15."],
+                    ["Reading and Writing", "How do I choose between two transitions that both sound right?"],
+                    ["Strategy", "I have 3 months before the SAT. How should I split my time?"],
+                  ].map(([topic, text]) => (
+                    <div key={topic} className="rounded-xl bg-secondary p-4 text-sm">
+                      <span className="text-xs font-bold uppercase tracking-wider text-primary">{topic}</span>
+                      <p className="mt-1">“{text}”</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-sm text-muted-foreground">Tip: add a photo of the question, and say what you tried. You get a better answer faster.</p>
+              </>
+            ) : (
+              <p className="text-center text-sm text-muted-foreground">Nothing matches that search.</p>
+            )}
           </li>
         )}
       </ul>
@@ -283,7 +301,6 @@ function ForumPage() {
 
 function NewPostForm({ userId, onDone }: { userId: string; onDone: () => void }) {
   const qc = useQueryClient();
-  const generateAiReply = useServerFn(generateForumAiReply);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [topic, setTopic] = useState("General");
@@ -298,6 +315,8 @@ function NewPostForm({ userId, onDone }: { userId: string; onDone: () => void })
       const { data: created, error } = await supabase
         .from("forum_posts")
         .insert({
+          // Asked from a lesson page (/forum?lesson=prop): the thread links back to it.
+          lesson_slug: new URLSearchParams(window.location.search).get("lesson") || null,
           user_id: userId,
           title: title.trim().slice(0, 200),
           body: body.trim().slice(0, 5000),
@@ -315,14 +334,6 @@ function NewPostForm({ userId, onDone }: { userId: string; onDone: () => void })
       qc.invalidateQueries({ queryKey: ["forum-posts"] });
       toast.success("Question posted");
       onDone();
-      // Fire-and-forget: the AI tutor's first-pass answer appears in the
-      // thread a few seconds later. Not awaited so it never blocks or fails
-      // the post itself.
-      if (postId) {
-        generateAiReply({ data: { postId } }).catch((err) => {
-          console.error("AI forum reply failed", err);
-        });
-      }
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });

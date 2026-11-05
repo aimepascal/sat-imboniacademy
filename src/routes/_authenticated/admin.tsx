@@ -12,13 +12,23 @@ import type { Resource } from "@/lib/db-types";
 import type { ContentType, ChatMessage, GeneratedDraft, ResourceDraft, ForumPostDraft } from "@/lib/admin-ai.functions";
 import { generateContent, publishGeneratedContent } from "@/lib/admin-ai.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { LessonsAdmin, ReportsAdmin } from "@/components/admin/LessonEditor";
+import { SiteHealth } from "@/components/admin/SiteHealth";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Control Center | Imboni SAT Hub" }] }),
   component: AdminPage,
 });
 
-type Tab = "overview" | "resources" | "users" | "ai";
+type Tab = "overview" | "lessons" | "reports" | "resources" | "users" | "ai";
+const TAB_LABEL: Record<Tab, string> = {
+  overview: "Overview",
+  lessons: "Lessons",
+  reports: "Reports from students",
+  resources: "Library guides",
+  users: "Users & Roles",
+  ai: "Writing helper",
+};
 
 function AdminPage() {
   const { user } = Route.useRouteContext();
@@ -50,19 +60,21 @@ function AdminPage() {
       </div>
 
       <div className="mt-8 flex gap-1 rounded-lg border border-border bg-surface p-1 w-fit flex-wrap">
-        {(["overview", "resources", "users", "ai"] as Tab[]).map((t) => (
+        {(Object.keys(TAB_LABEL) as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition ${tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
-            {t === "overview" ? "Overview" : t === "resources" ? "Old Vault resources" : t === "users" ? "Users & Roles" : "AI Copilot"}
+            {TAB_LABEL[t]}
           </button>
         ))}
       </div>
 
       <div className="mt-6">
-        {tab === "overview" && <Overview />}
+        {tab === "overview" && <><Overview /><SiteHealth /></>}
+        {tab === "lessons" && <LessonsAdmin userId={user.id} />}
+        {tab === "reports" && <ReportsAdmin />}
         {tab === "resources" && <ResourcesAdmin authorId={user.id} />}
         {tab === "users" && <UsersAudit />}
         {tab === "ai" && <AiCopilot authorId={user.id} />}
@@ -450,7 +462,7 @@ function AiCopilot({ authorId }: { authorId: string }) {
       <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
         <div>
           <h2 className="font-display text-lg font-semibold flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" /> AI Copilot
+            <Sparkles className="h-5 w-5 text-primary" /> Writing helper
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">Generate a draft, refine it by chatting, then publish.</p>
         </div>

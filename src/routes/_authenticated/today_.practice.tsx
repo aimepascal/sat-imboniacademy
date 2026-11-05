@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { BadgeCheck, Loader2, Sparkles } from "lucide-react";
+import { BadgeCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { QuestionBody } from "@/components/learn/QuestionBody";
+import type { PracticeQuestion } from "@/lib/content";
 import { useI18n, localized } from "@/lib/i18n";
-import { explainDifferently, type AiExplainResult } from "@/lib/ai-explain.functions";
 import { learningDb, type AttemptInput, type Question } from "@/lib/learning/db";
 import { loadOrBuildTodayPlan } from "@/lib/learning/plan";
 
-export const Route = createFileRoute("/_authenticated/practice")({
+export const Route = createFileRoute("/_authenticated/today_/practice")({
   head: () => ({ meta: [{ title: "Practice | Imboni SAT Hub" }] }),
   component: Practice,
 });
@@ -115,7 +115,7 @@ function Practice() {
 
   return (
     <QuestionCard
-      // Remounts for each question, which resets the answer and AI state.
+      // Remounts for each question, which resets the answer.
       key={question.id}
       question={question}
       skill={lookups.skills.get(question.skill_id)}
@@ -162,11 +162,9 @@ type QuestionCardProps = {
 function QuestionCard(props: QuestionCardProps) {
   const { question } = props;
   const { t, language } = useI18n();
-  const askAi = useServerFn(explainDifferently);
 
   const [selected, setSelected] = useState<number | null>(null);
   const [phase, setPhase] = useState<"answering" | "saving" | "answered">("answering");
-  const [ai, setAi] = useState<"loading" | AiExplainResult | null>(null);
 
   const startedAt = useRef(Date.now());
   // Created once per question, so pressing "Check answer" again after a failed
@@ -198,15 +196,6 @@ function QuestionCard(props: QuestionCardProps) {
     await props.onSaved(selected === correctIndex);
   };
 
-  const explain = async () => {
-    if (selected === null || ai === "loading") return;
-    setAi("loading");
-    try {
-      setAi(await askAi({ data: { questionId: question.id, optionIndex: selected, language } }));
-    } catch {
-      setAi({ status: "unavailable" });
-    }
-  };
 
   const chosen = selected === null ? null : question.options[selected];
   const slip =
@@ -225,7 +214,7 @@ function QuestionCard(props: QuestionCardProps) {
         <span>{t("practice.progress", { current: props.current, total: props.total })}</span>
       </div>
 
-      <p className="mt-5 whitespace-pre-wrap text-base leading-relaxed">{question.stem}</p>
+      <div className="mt-5"><QuestionBody q={question as unknown as PracticeQuestion} lang={language} /></div>
 
       <div className="mt-5 grid gap-2.5" role="radiogroup">
         {question.options.map((option, index) => (
@@ -277,7 +266,7 @@ function QuestionCard(props: QuestionCardProps) {
             {wasCorrect ? t("practice.correct") : t("practice.incorrect")}
           </p>
 
-          {/* The reviewed explanation always comes first and never depends on the AI. */}
+          
           <section className="mt-3 rounded-2xl border border-border bg-muted/40 p-4">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-sm font-semibold">{t("practice.explanation")}</h2>
@@ -298,40 +287,10 @@ function QuestionCard(props: QuestionCardProps) {
             )}
           </section>
 
-          {ai !== null && (
-            <section className="mt-3 rounded-2xl border border-dashed border-border p-4">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-                <Sparkles className="h-4 w-4" /> {t("practice.aiHelp")}
-              </h2>
-              {ai === "loading" && (
-                <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("practice.aiLoading")}
-                </p>
-              )}
-              {ai !== "loading" && ai.status === "ok" && (
-                <>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{ai.text}</p>
-                  <p className="mt-3 text-xs text-muted-foreground">{t("practice.aiNote")}</p>
-                </>
-              )}
-              {ai !== "loading" && ai.status === "limited" && (
-                <p className="mt-2 text-sm text-muted-foreground">{t("practice.aiLimited")}</p>
-              )}
-              {ai !== "loading" && ai.status === "unavailable" && (
-                <p className="mt-2 text-sm text-muted-foreground">{t("practice.aiUnavailable")}</p>
-              )}
-            </section>
-          )}
-
           <div className="mt-5 flex flex-wrap gap-2">
             <Button size="lg" className="flex-1" onClick={props.onNext}>
               {t("practice.gotIt")}
             </Button>
-            {ai === null && (
-              <Button size="lg" variant="outline" className="flex-1" onClick={explain}>
-                {t("practice.explainDifferently")}
-              </Button>
-            )}
           </div>
         </>
       )}

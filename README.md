@@ -8,18 +8,24 @@ Built and run by **Aime Pascal Komezusenge** for Imboni Academy, Kigali, Rwanda.
 
 | Folder or file | What it does |
 | --- | --- |
-| `public/learn/` | The **Learn** page (home): SAT map, lessons, cheat codes, library, practice for guests. Plain HTML and JavaScript. |
-| `public/learn/content.js`, `data.js`, `universal.js` | The lessons, skills, practice questions and cheat codes. |
-| `src/routes/` | The other pages. One file per page: `forum.tsx` is `/forum`, `impact.tsx` is `/impact`, and so on. |
-| `src/routes/_authenticated/` | Pages that need an account: `today.tsx` (Today's plan), `practice.tsx`, `review-desk.tsx`, `admin.tsx` (Control Center). |
-| `src/components/SiteHeader.tsx` | The menu bar at the top of every page. |
-| `src/components/SiteFooter.tsx` | The footer. |
-| `src/lib/track.ts` | Counts visits for the Control Center (no names or emails). |
-| `src/lib/learning/` | The practice engine: picks questions from each student's weak skills. |
-| `src/lib/i18n/` | English (`en.ts`) and Kinyarwanda (`rw.ts`) words. |
-| `src/styles.css` | Colours and fonts. Imboni navy is `--primary: #10508a`. |
+| `src/routes/learn.index.tsx` | The Learn home page. |
+| `src/routes/learn.$slug.tsx` | One lesson, with the Learn, Practice and Cheat codes tabs (`/learn/proportions`…). |
+| `src/routes/practice.tsx`, `check.tsx`, `test.tsx` | Practice list, the 10-minute check, the full practice test. |
+| `src/routes/library.tsx`, `codes.*.tsx` | Library (guides, books, lessons) and the universal cheat codes. |
+| `src/routes/forum.tsx`, `forum_.$postId.tsx` | The community. |
+| `src/routes/_authenticated/` | Pages that need an account: `me.tsx` (progress and account), `review.tsx` (mistake notebook), `today.tsx`, `welcome.tsx`, `classes.tsx` (teachers), `admin.tsx` (Control Center). |
+| `src/components/learn/` | The practice panel, how a question is drawn, the SAT map. |
+| `src/components/admin/` | Control Center: lesson editor, reports, site health. |
+| `src/lib/content/` | Reads lessons and questions from the database; saves lesson progress. |
+| `src/lib/track.ts`, `report-error.ts` | Counts visits and reports page errors for the Control Center (no names or emails). |
 | `supabase/migrations/` | Database changes, in date order. |
-| `public/og-image.png` | The picture shown when a link is shared on WhatsApp or social media. |
+| `supabase/seed/` | The lessons, questions and cheat codes as files, and `import.sql` to load them. |
+
+## Where the lessons live
+
+Lessons, questions and cheat codes are in the database, so they can be edited in
+**Control Center → Lessons** without changing code. `supabase/seed/` keeps the
+original files; `import.sql` loads them again (it replaces Control Center edits).
 
 ## Running it on your computer
 
@@ -37,4 +43,4 @@ Settings and secrets (Supabase keys, `GEMINI_API_KEY`) are in Vercel → Project
 ## Database updates
 
 New files in `supabase/migrations/` must be run once in Supabase (SQL Editor, or `supabase db push`).
-The visitor statistics in the Control Center need `20261103120000_page_views_and_admin_stats.sql`.
+Run them in date order. After `20261105120000_lessons_in_database.sql`, run `supabase/seed/import.sql` once.

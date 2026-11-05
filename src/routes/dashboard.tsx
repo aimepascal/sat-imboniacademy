@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { redirectToLearn } from "@/lib/learn-redirect";
+import { redirectTo } from "@/lib/learn-redirect";
 
-// Explore/Dashboard was replaced by /learn (home and "My learning").
-export const Route = createFileRoute("/dashboard")(redirectToLearn(301));
+// The old dashboard: a student's progress is now in Me.
+export const Route = createFileRoute("/dashboard")(redirectTo("/me", 301));

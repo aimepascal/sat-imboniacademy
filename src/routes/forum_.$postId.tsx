@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ReplyExtras, TutorBadge, useVotes } from "@/components/forum/ReplyExtras";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -135,9 +137,12 @@ function ThreadPage() {
         .select("*, profiles!forum_replies_profile_fk(display_name,avatar_url)")
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
+
       return data ?? [];
     },
   });
+  const votes = useVotes(replies.map((r) => r.id));
+  const { data: isAdminUser } = useIsAdmin(userId);
 
   const submit = useMutation({
     mutationFn: async () => {
@@ -233,6 +238,9 @@ function ThreadPage() {
             )}
           </div>
           <h1 className="mt-4 font-display text-3xl leading-[1.1] tracking-tight sm:text-4xl">{post.title}</h1>
+          {(post as { lesson_slug?: string | null }).lesson_slug && (
+            <a href={`/learn/${(post as { lesson_slug?: string }).lesson_slug}`} className="mt-2 inline-block text-sm font-semibold text-primary underline">Open the lesson for this question →</a>
+          )}
           <div className="mt-5 flex items-center gap-3">
             <Avatar name={author} url={post.profiles?.avatar_url} />
             <div>
@@ -290,9 +298,9 @@ function ThreadPage() {
         </h2>
 
         <ul className="mt-5 space-y-4">
-          {replies.map((r) => {
+          {[...replies].sort((x, y) => Number(!!(y as { is_best?: boolean }).is_best) - Number(!!(x as { is_best?: boolean }).is_best)).map((r) => {
             const isAi = r.is_ai_generated;
-            const rAuthor = isAi ? "AI Tutor" : (r.profiles?.display_name ?? "Student");
+            const rAuthor = isAi ? "Imboni helper" : (r.profiles?.display_name ?? "Student");
             return (
               <li
                 key={r.id}
@@ -304,6 +312,7 @@ function ThreadPage() {
                     <div>
                       <p className="flex items-center gap-1.5 text-sm font-semibold">
                         {rAuthor}
+                        {!isAi && <TutorBadge userId={r.user_id} />}
                         {isAi && (
                           <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
                             AI
@@ -361,6 +370,7 @@ function ThreadPage() {
                     <AttachmentCard url={r.file_url} name={r.file_name} type={r.file_type} size={r.file_size} />
                   </div>
                 )}
+                <ReplyExtras replyId={r.id} isBest={!!(r as { is_best?: boolean }).is_best} canChooseBest={!!userId && (post?.user_id === userId || !!isAdminUser)} userId={userId} votes={votes.data ?? []} onChanged={() => qc.invalidateQueries({ queryKey: ["forum-replies", postId] })} />
               </li>
             );
           })}

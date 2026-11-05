@@ -30,7 +30,7 @@ export function PrivacyNotice() {
     <div
       role="region"
       aria-label="Privacy notice"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center gap-3 rounded-2xl bg-secondary-foreground px-4 py-3 text-sm text-white shadow-elevated sm:left-6 sm:right-auto"
+      className="fixed inset-x-4 bottom-20 z-50 lg:bottom-4 mx-auto flex max-w-md items-center gap-3 rounded-2xl bg-secondary-foreground px-4 py-3 text-sm text-white shadow-elevated sm:left-6 sm:right-auto"
     >
       <p className="m-0 leading-snug">
         We count visits to improve the Hub. No ads, and we never sell your data.{" "}

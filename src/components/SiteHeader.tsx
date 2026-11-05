@@ -15,12 +15,12 @@ import { useIsAdmin } from "@/hooks/use-is-admin";
 import { canReviewQuestions, useRoles } from "@/hooks/use-roles";
 import { LANGUAGES, setLanguage, useI18n, type Language } from "@/lib/i18n";
 import { learningDb } from "@/lib/learning/db";
-import { LEARN_PATH } from "@/lib/learn-redirect";
 import logoUrl from "@/assets/logo.png";
 
 // One compact bar (56px) on every page.
-// Main links: Learn, Practice, Library, Cheat codes, Community.
-// Signed in: an account menu with Today's plan, Review desk, Control Center and Sign out.
+// Main links: Learn, Practice, Library, Cheat codes, Community. On phones the same
+// links are in the bottom bar (BottomNav); the menu button holds the rest.
+// Signed in: an account menu with Me, Today's plan, Review desk, Control Center and Sign out.
 export function SiteHeader() {
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string>("");
@@ -49,7 +49,7 @@ export function SiteHeader() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    window.location.assign(LEARN_PATH);
+    window.location.assign("/learn");
   };
 
   const { t, language } = useI18n();
@@ -79,18 +79,26 @@ export function SiteHeader() {
     </div>
   );
 
-  // /learn is a static page in public/learn, so these are plain links.
-  const mainLinks: { href: string; label: string }[] = [
-    { href: LEARN_PATH, label: "Learn" },
-    { href: userId ? "/practice" : `${LEARN_PATH}#practice`, label: t("nav.practice") },
-    { href: `${LEARN_PATH}#library`, label: "Library" },
-    { href: `${LEARN_PATH}#codes`, label: "Cheat codes" },
-    { href: "/forum", label: "Community" },
+  const mainLinks: { to: string; label: string }[] = [
+    { to: "/learn", label: "Learn" },
+    { to: "/practice", label: t("nav.practice") },
+    { to: "/library", label: "Library" },
+    { to: "/codes", label: "Cheat codes" },
+    { to: "/forum", label: "Community" },
+  ];
+  const moreLinks: { to: string; label: string }[] = [
+    { to: "/codes", label: "Cheat codes" },
+    { to: "/check", label: "10-minute check" },
+    { to: "/test", label: "Full practice test" },
+    { to: "/tutors", label: "Tutors and mentors" },
+    { to: "/impact", label: "Impact" },
   ];
 
   const accountLinks: { to: string; label: string }[] = [
+    { to: "/me", label: "My progress" },
     { to: "/today", label: "Today's plan" },
     ...(canReviewQuestions(roles) ? [{ to: "/review-desk", label: t("nav.reviewDesk") }] : []),
+    ...(roles?.includes("teacher") || isAdmin ? [{ to: "/classes", label: "My classes" }] : []),
     ...(isAdmin ? [{ to: "/admin", label: "Control Center" }] : []),
   ];
 
@@ -101,16 +109,16 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
-        <a href={LEARN_PATH} className="flex items-center gap-2 font-display text-base font-bold tracking-tight" aria-label="Imboni SAT Hub home">
+        <Link to="/learn" className="flex items-center gap-2 font-display text-base font-bold tracking-tight" aria-label="Imboni SAT Hub home">
           <img src={logoUrl} alt="" width={30} height={30} className="h-[30px] w-[30px]" />
           <span>Imboni SAT Hub</span>
-        </a>
+        </Link>
 
         <nav className="ml-2 hidden items-center gap-0.5 lg:flex" aria-label="Main">
           {mainLinks.map((l) => (
-            <a key={l.label} href={l.href} className={linkClass}>
+            <Link key={l.to} to={l.to} className={linkClass} activeProps={{ className: "bg-secondary text-primary" }}>
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -136,9 +144,6 @@ export function SiteHeader() {
                     <Link to={l.to}>{l.label}</Link>
                   </DropdownMenuItem>
                 ))}
-                <DropdownMenuItem asChild>
-                  <a href={`${LEARN_PATH}#mine`}>My learning</a>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="text-destructive">
                   Sign out
@@ -153,9 +158,10 @@ export function SiteHeader() {
           )}
         </div>
 
+        <div className="ml-auto lg:hidden">{languageSwitch}</div>
         <button
           type="button"
-          className="ml-auto grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
+          className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
           onClick={() => setOpen(!open)}
           aria-label={open ? "Close the menu" : "Open the menu"}
           aria-expanded={open}
@@ -167,10 +173,10 @@ export function SiteHeader() {
       {open && (
         <div className="fixed inset-x-0 bottom-0 top-14 z-40 overflow-y-auto bg-background lg:hidden">
           <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Main">
-            {mainLinks.map((l) => (
-              <a key={l.label} href={l.href} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 font-display text-lg font-bold">
+            {moreLinks.map((l) => (
+              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 font-display text-lg font-bold">
                 {l.label}
-              </a>
+              </Link>
             ))}
             {userId &&
               accountLinks.map((l) => (
@@ -178,7 +184,6 @@ export function SiteHeader() {
                   {l.label}
                 </Link>
               ))}
-            <div className="mt-3 self-start">{languageSwitch}</div>
             {userId ? (
               <Button variant="outline" className="mt-4 h-12" onClick={handleSignOut}>Sign out</Button>
             ) : (

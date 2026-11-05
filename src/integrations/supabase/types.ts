@@ -52,6 +52,7 @@ export type Database = {
       }
       forum_posts: {
         Row: {
+          lesson_slug: string | null
           body: string
           created_at: string
           file_name: string | null
@@ -69,6 +70,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          lesson_slug?: string | null
           body: string
           created_at?: string
           file_name?: string | null
@@ -86,6 +88,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          lesson_slug?: string | null
           body?: string
           created_at?: string
           file_name?: string | null
@@ -114,6 +117,7 @@ export type Database = {
       }
       forum_replies: {
         Row: {
+          is_best: boolean
           body: string
           created_at: string
           file_name: string | null
@@ -131,6 +135,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          is_best?: boolean
           body: string
           created_at?: string
           file_name?: string | null
@@ -148,6 +153,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          is_best?: boolean
           body?: string
           created_at?: string
           file_name?: string | null
