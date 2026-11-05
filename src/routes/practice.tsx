@@ -62,23 +62,39 @@ function PracticeHome() {
 
       {site.sat_map.map((p) => (
         <section key={p.id}>
-          <h2 className="mb-1 mt-9 text-2xl font-bold">{p.name}</h2>
-          {p.domains.map((d) => (
-            <div key={d.id} className="mt-4">
-              <h3 className="mb-2 font-bold">{d.name}</h3>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {lessons.filter((l) => l.domain_slug === d.id).map((l) => {
-                  const pr = progress[l.slug];
-                  return (
-                    <Link key={l.slug} to="/learn/$slug" params={{ slug: l.slug }} search={{ tab: "practice" }} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card p-3.5 hover:border-primary">
-                      <span><b className="block text-[15px]">{l.name}</b><span className="text-xs text-muted-foreground">16 questions</span></span>
-                      {pr?.last_total ? <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-bold text-primary">{pr.last_score}/{pr.last_total}</span> : null}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+          <h2 className="mb-3 mt-9 text-2xl font-bold">{p.name}</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {p.domains.map((d) => {
+              const list = lessons.filter((l) => l.domain_slug === d.id);
+              const tried = list.filter((l) => progress[l.slug]?.last_total).length;
+              return (
+                <div key={d.id} className="rounded-2xl border border-border bg-card p-4">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <h3 className="font-bold">{d.name}</h3>
+                    <span className="text-xs text-muted-foreground">{d.pct} · {tried}/{list.length} practised</span>
+                  </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${(100 * tried) / Math.max(1, list.length)}%` }} /></div>
+                  <ul className="mt-3 divide-y divide-border">
+                    {list.map((l) => {
+                      const pr = progress[l.slug];
+                      return (
+                        <li key={l.slug}>
+                          <Link to="/learn/$slug" params={{ slug: l.slug }} search={{ tab: "practice" }} className="flex items-center gap-3 py-2.5 hover:text-primary">
+                            <span className="flex-1 text-[15px]">{l.name}</span>
+                            {pr?.last_total ? (
+                              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-bold text-primary">{pr.last_score}/{pr.last_total}</span>
+                            ) : (
+                              <span className="text-xs font-semibold text-muted-foreground">Start →</span>
+                            )}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
         </section>
       ))}
     </div>

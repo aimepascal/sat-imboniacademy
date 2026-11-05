@@ -98,7 +98,7 @@ function LessonPage() {
 
   return (
     <div className="mx-auto flex max-w-7xl">
-      <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 flex-none overflow-y-auto border-r border-border bg-card px-5 py-6 lg:block">
+      <aside className="hidden w-72 flex-none self-start border-r border-border bg-card px-5 py-6 lg:block">
         <SatMapNav map={site.sat_map} lessons={lessons} progress={progress} current={slug} />
       </aside>
 
