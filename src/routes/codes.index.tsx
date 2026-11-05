@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { universalCodesQuery } from "@/lib/content";
 import aime from "@/assets/aime.jpg";
+import { tr } from "@/lib/i18n/tr";
 
 export const Route = createFileRoute("/codes/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(universalCodesQuery),
@@ -15,14 +16,14 @@ export const Route = createFileRoute("/codes/")({
   component: Codes,
 });
 
-const GROUPS: [string, string][] = [["all", "Work in every part"], ["rw", "Reading and Writing"], ["m", "Math"]];
+const GROUPS: [string, string][] = [["all", "Work in every part"], ["rw", tr("Reading and Writing")], ["m", tr("Math")]];
 
 function Codes() {
   const { data: codes } = useSuspenseQuery(universalCodesQuery);
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Cheat codes</p>
-      <h1 className="mt-1 text-3xl font-bold tracking-tight">Cheat codes that work in every part</h1>
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Cheat codes")}</p>
+      <h1 className="mt-1 text-3xl font-bold tracking-tight">{tr("Cheat codes that work in every part")}</h1>
       <div className="mt-4 flex gap-4 rounded-2xl border border-border bg-card p-4 text-[15px] leading-relaxed">
         <img src={aime} alt="Aime Pascal" width={64} height={64} className="h-16 w-16 flex-none rounded-full object-cover object-top" />
         <div>
@@ -35,7 +36,7 @@ function Codes() {
         if (!list.length) return null;
         return (
           <section key={g}>
-            <h2 className="mb-3 mt-8 text-xl font-bold">{label}</h2>
+            <h2 className="mb-3 mt-8 text-xl font-bold">{tr(label)}</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((u) => (
                 <Link key={u.id} to="/codes/$id" params={{ id: u.id }} className="rounded-xl border border-border bg-card p-4 hover:border-primary">

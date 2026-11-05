@@ -5,6 +5,7 @@ import { Download, ExternalLink, FileText, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { lessonIndexQuery, siteContentQuery } from "@/lib/content";
+import { tr } from "@/lib/i18n/tr";
 
 export interface Resource {
   id: string;
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/library")({
 });
 
 type Filter = "all" | "m" | "rw" | "books";
-const MATH = ["Algebra", "Advanced Math", "Problem-Solving and Data Analysis", "Geometry and Trigonometry", "Math"];
+const MATH = ["Algebra", "Advanced Math", "Problem-Solving and Data Analysis", "Geometry and Trigonometry", tr("Math")];
 const isMath = (r: Resource) => MATH.includes(r.category) || /math/i.test(r.section);
 
 function Library() {
@@ -68,13 +69,13 @@ function Library() {
   const matchLessons = lessons.filter((l) => (f === "all" || f === l.section) && has(l.name, l.summary));
   const books = site.books.filter((b) => (f === "all" || f === "books") && has(b.title, b.note));
 
-  const chips: [Filter, string][] = [["all", "All"], ["m", "Math"], ["rw", "Reading and Writing"], ["books", "Books and tools"]];
+  const chips: [Filter, string][] = [["all", tr("All")], ["m", tr("Math")], ["rw", tr("Reading and Writing")], ["books", tr("Books and tools")]];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Library</p>
-      <h1 className="mt-1 text-3xl font-bold tracking-tight">Books, guides and lessons</h1>
-      <p className="mt-2 text-muted-foreground">Guides by SAT topic, free official tools, and every lesson on the Hub.</p>
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Library")}</p>
+      <h1 className="mt-1 text-3xl font-bold tracking-tight">{tr("Books, guides and lessons")}</h1>
+      <p className="mt-2 text-muted-foreground">{tr("Guides by SAT topic, free official tools, and every lesson on the Hub.")}</p>
 
       <label className="mt-5 flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-3">
         <Search className="h-4 w-4 text-muted-foreground" />
@@ -90,9 +91,9 @@ function Library() {
 
       {f !== "books" && (
         <section>
-          <h2 className="mb-3 mt-7 text-xl font-bold">Guides by topic</h2>
+          <h2 className="mb-3 mt-7 text-xl font-bold">{tr("Guides by topic")}</h2>
           {resources.isLoading && <p className="text-muted-foreground">Loading…</p>}
-          {!resources.isLoading && !guides.length && <p className="text-muted-foreground">No guides match.</p>}
+          {!resources.isLoading && !guides.length && <p className="text-muted-foreground">{tr("No guides match.")}</p>}
           <div className="space-y-2">
             {guides.map((r) => (
               <div key={r.id} className="rounded-xl border border-border bg-card">
@@ -106,7 +107,7 @@ function Library() {
                     <div className="mt-2 whitespace-pre-line text-foreground/90">{r.content}</div>
                     {r.file_url && (
                       <a href={r.file_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 font-semibold text-primary-foreground">
-                        <Download className="h-4 w-4" /> Open the file
+                        <Download className="h-4 w-4" /> {tr("Open the file")}
                       </a>
                     )}
                   </div>
@@ -119,7 +120,7 @@ function Library() {
 
       {books.length > 0 && (
         <section>
-          <h2 className="mb-3 mt-8 text-xl font-bold">Free books and official tools</h2>
+          <h2 className="mb-3 mt-8 text-xl font-bold">{tr("Free books and official tools")}</h2>
           <div className="space-y-2">
             {books.map((b) => (
               <a key={b.url} href={b.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 hover:border-primary">
@@ -128,13 +129,13 @@ function Library() {
               </a>
             ))}
           </div>
-          <p className="mt-3 text-sm text-muted-foreground">Only free and legal sources are listed. Good SAT books are copyrighted, so they cannot be copied here.</p>
+          <p className="mt-3 text-sm text-muted-foreground">{tr("Only free and legal sources are listed. Good SAT books are copyrighted, so they cannot be copied here.")}</p>
         </section>
       )}
 
       {f !== "books" && matchLessons.length > 0 && (
         <section>
-          <h2 className="mb-3 mt-8 text-xl font-bold">Lessons</h2>
+          <h2 className="mb-3 mt-8 text-xl font-bold">{tr("Lessons")}</h2>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {matchLessons.map((l) => (
               <Link key={l.slug} to="/learn/$slug" params={{ slug: l.slug }} className="rounded-xl border border-border bg-card p-3.5 hover:border-primary">

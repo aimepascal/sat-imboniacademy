@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { lessonIndexQuery, siteContentQuery } from "@/lib/content";
 import { useProgress } from "@/lib/content/progress";
+import { tr } from "@/lib/i18n/tr";
 
 export const Route = createFileRoute("/practice")({
   loader: ({ context }) =>
@@ -37,21 +38,21 @@ function PracticeHome() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Practice</p>
-      <h1 className="mt-1 text-3xl font-bold tracking-tight">Practise every part</h1>
-      <p className="mt-2 text-muted-foreground">Every skill has 16 questions in two rounds, easy to very hard. Timed like the real test, or with no clock.</p>
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Practice")}</p>
+      <h1 className="mt-1 text-3xl font-bold tracking-tight">{tr("Practise every part")}</h1>
+      <p className="mt-2 text-muted-foreground">{tr("Every skill has 16 questions in two rounds, easy to very hard. Timed like the real test, or with no clock.")}</p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link to="/check" className="rounded-2xl bg-primary p-4 text-primary-foreground">
           <b className="block">10-minute check</b>
-          <span className="text-sm text-primary-foreground/80">One question from each part. Find your weak spots.</span>
+          <span className="text-sm text-primary-foreground/80">{tr("One question from each part. Find your weak spots.")}</span>
         </Link>
         <Link to="/test" className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
-          <b className="block">Full practice test</b>
-          <span className="text-sm text-muted-foreground">Two timed modules, like test day, with a score.</span>
+          <b className="block">{tr("Full practice test")}</b>
+          <span className="text-sm text-muted-foreground">{tr("Two timed modules, like test day, with a score.")}</span>
         </Link>
         <Link to={userId ? "/today" : "/auth"} className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
-          <b className="block">Today's plan</b>
+          <b className="block">{tr("Today's plan")}</b>
           <span className="text-sm text-muted-foreground">{userId ? "Short practice from your weakest skills." : "Sign in to get a daily plan."}</span>
         </Link>
         <Link to={userId ? "/me" : "/auth"} className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
@@ -62,7 +63,7 @@ function PracticeHome() {
 
       {site.sat_map.map((p) => (
         <section key={p.id}>
-          <h2 className="mb-3 mt-9 text-2xl font-bold">{p.name}</h2>
+          <h2 className="mb-3 mt-9 text-2xl font-bold">{tr(p.name)}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {p.domains.map((d) => {
               const list = lessons.filter((l) => l.domain_slug === d.id);
@@ -70,7 +71,7 @@ function PracticeHome() {
               return (
                 <div key={d.id} className="rounded-2xl border border-border bg-card p-4">
                   <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="font-bold">{d.name}</h3>
+                    <h3 className="font-bold">{tr(d.name)}</h3>
                     <span className="text-xs text-muted-foreground">{d.pct} · {tried}/{list.length} practised</span>
                   </div>
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${(100 * tried) / Math.max(1, list.length)}%` }} /></div>
@@ -84,7 +85,7 @@ function PracticeHome() {
                             {pr?.last_total ? (
                               <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-bold text-primary">{pr.last_score}/{pr.last_total}</span>
                             ) : (
-                              <span className="text-xs font-semibold text-muted-foreground">Start →</span>
+                              <span className="text-xs font-semibold text-muted-foreground">{tr("Start →")}</span>
                             )}
                           </Link>
                         </li>

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import aime from "@/assets/aime.jpg";
+import { tr } from "@/lib/i18n/tr";
 
 export const Route = createFileRoute("/impact")({
   head: () => ({
@@ -37,8 +38,8 @@ function Impact() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Impact</p>
-      <h1 className="mt-1 text-3xl font-bold tracking-tight">Free SAT prep, built in Kigali</h1>
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Impact")}</p>
+      <h1 className="mt-1 text-3xl font-bold tracking-tight">{tr("Free SAT prep, built in Kigali")}</h1>
       <p className="mt-2 text-muted-foreground">What is on the Hub today. Student numbers appear here once there are enough to share. They come straight from the site.</p>
 
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -61,16 +62,16 @@ function Impact() {
       <div className="mt-6 flex gap-4 rounded-2xl border border-border bg-card p-5">
         <img src={aime} alt="Aime Pascal" width={56} height={56} className="h-14 w-14 flex-none rounded-full object-cover object-top" />
         <div className="text-[15px] leading-relaxed">
-          <b>Why it is free</b>
-          <p className="mt-1">Many students in Rwanda cannot pay for an SAT course. I started Imboni so that anyone who wants to study has lessons, practice and people to ask, at no cost.</p>
-          <p className="mt-1 text-muted-foreground">Aime Pascal, founder of Imboni Academy</p>
+          <b>{tr("Why it is free")}</b>
+          <p className="mt-1">{tr("Many students in Rwanda cannot pay for an SAT course. I started Imboni so that anyone who wants to study has lessons, practice and people to ask, at no cost.")}</p>
+          <p className="mt-1 text-muted-foreground">{tr("Aime Pascal, founder of Imboni Academy")}</p>
         </div>
       </div>
 
       <div className="mt-3 rounded-2xl bg-primary p-5 text-primary-foreground">
-        <b className="text-lg">Help keep it free</b>
-        <p className="mt-1 text-primary-foreground/80">Your gift pays for hosting and new lessons.</p>
-        <a href="https://imboniacademy.org/donate" className="mt-3 inline-block h-11 rounded-xl bg-white px-5 font-bold leading-[44px] text-primary">Donate</a>
+        <b className="text-lg">{tr("Help keep it free")}</b>
+        <p className="mt-1 text-primary-foreground/80">{tr("Your gift pays for hosting and new lessons.")}</p>
+        <a href="https://imboniacademy.org/donate" className="mt-3 inline-block h-11 rounded-xl bg-white px-5 font-bold leading-[44px] text-primary">{tr("Donate")}</a>
       </div>
 
       <p className="mt-6 text-sm text-muted-foreground">Did the Hub help you? Tell your story in the <Link to="/forum" className="font-semibold text-primary underline">community</Link>. Aime reads every message.</p>

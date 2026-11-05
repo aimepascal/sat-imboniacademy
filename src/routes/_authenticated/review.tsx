@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { checkAnswer, pick, recordAttempt, type AnswerCheck, type PracticeQuestion } from "@/lib/content";
 import { QuestionBody } from "@/components/learn/QuestionBody";
+import { tr } from "@/lib/i18n/tr";
 
 export const Route = createFileRoute("/_authenticated/review")({
   head: () => ({ meta: [{ title: "Mistake notebook | Imboni SAT Hub" }, { name: "robots", content: "noindex" }] }),
@@ -43,7 +44,7 @@ function Review() {
         <p className="text-4xl" aria-hidden>{qs.length ? "👏" : "✓"}</p>
         <h1 className="mt-2 text-2xl font-bold">{qs.length ? `Done: ${right} of ${qs.length} right` : "Nothing to review today"}</h1>
         <p className="mt-2 text-muted-foreground">{qs.length ? "Questions you got right come back later. The others come back tomorrow." : "Questions you miss in practice come back here on the right day."}</p>
-        <Link to="/me" onClick={() => qc.invalidateQueries({ queryKey: ["me-review", user.id] })} className="mt-6 inline-block h-11 rounded-xl bg-primary px-6 font-bold leading-[44px] text-primary-foreground">Back to my progress</Link>
+        <Link to="/me" onClick={() => qc.invalidateQueries({ queryKey: ["me-review", user.id] })} className="mt-6 inline-block h-11 rounded-xl bg-primary px-6 font-bold leading-[44px] text-primary-foreground">{tr("Back to my progress")}</Link>
       </div>
     );
 
@@ -60,7 +61,7 @@ function Review() {
 
   return (
     <div className="mx-auto max-w-xl space-y-4 px-4 py-6">
-      <div className="flex justify-between text-sm font-semibold text-muted-foreground"><span>Mistake notebook</span><span>{i + 1} of {qs.length}</span></div>
+      <div className="flex justify-between text-sm font-semibold text-muted-foreground"><span>{tr("Mistake notebook")}</span><span>{i + 1} of {qs.length}</span></div>
       <QuestionBody q={q} lang={language} />
       <div className="space-y-2">
         {q.options.map((o, k) => (
@@ -75,8 +76,8 @@ function Review() {
         <>
           <div className="rounded-xl border border-border bg-card p-4 text-[15px]"><b>{check.correct ? "Correct. " : "Not yet. "}</b>The answer is {letter(check.answer)}. {pick(language, check.why, check.why_rw)}</div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => { setPicked(null); setCheck(null); setI(i + 1); window.scrollTo(0, 0); }} className="h-11 flex-1 rounded-xl bg-primary font-bold text-primary-foreground">Next</button>
-            <Link to="/learn/$slug" params={{ slug: q.lesson_slug }} className="h-11 rounded-xl border border-primary px-4 font-semibold leading-[44px] text-primary">Open the lesson</Link>
+            <button type="button" onClick={() => { setPicked(null); setCheck(null); setI(i + 1); window.scrollTo(0, 0); }} className="h-11 flex-1 rounded-xl bg-primary font-bold text-primary-foreground">{tr("Next")}</button>
+            <Link to="/learn/$slug" params={{ slug: q.lesson_slug }} className="h-11 rounded-xl border border-primary px-4 font-semibold leading-[44px] text-primary">{tr("Open the lesson")}</Link>
           </div>
         </>
       )}
