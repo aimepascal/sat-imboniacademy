@@ -245,7 +245,7 @@ function LearnTab({ c, lesson, note, subLessons, done, onDone }: {
       <div className="mt-8 rounded-2xl border border-border bg-card p-5">
         <b>Need help with this part?</b>
         <p className="mt-1 text-sm text-muted-foreground">Ask in the community. Tutors and other students answer.</p>
-        <Link to="/forum" className="mt-3 inline-block h-10 rounded-lg border border-primary px-4 font-semibold leading-10 text-primary">Ask a question</Link>
+        <a href={`/forum?lesson=${lesson.slug}`} className="mt-3 inline-block h-10 rounded-lg border border-primary px-4 font-semibold leading-10 text-primary">Ask a question</a>
       </div>
     </article>
   );

@@ -41,10 +41,14 @@ function PracticeHome() {
       <h1 className="mt-1 text-3xl font-bold tracking-tight">Practise every part</h1>
       <p className="mt-2 text-muted-foreground">Every skill has 16 questions in two rounds, easy to very hard. Timed like the real test, or with no clock.</p>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link to="/check" className="rounded-2xl bg-primary p-4 text-primary-foreground">
           <b className="block">10-minute check</b>
           <span className="text-sm text-primary-foreground/80">One question from each part. Find your weak spots.</span>
+        </Link>
+        <Link to="/test" className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
+          <b className="block">Full practice test</b>
+          <span className="text-sm text-muted-foreground">Two timed modules, like test day, with a score.</span>
         </Link>
         <Link to={userId ? "/today" : "/auth"} className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
           <b className="block">Today's plan</b>

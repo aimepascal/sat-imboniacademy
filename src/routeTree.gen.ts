@@ -21,10 +21,12 @@ import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TestRouteImport } from './routes/test'
 import { Route as TutorsRouteImport } from './routes/tutors'
 import { Route as VaultRouteImport } from './routes/vault'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAuditLogsRouteImport } from './routes/_authenticated/audit-logs'
+import { Route as AuthenticatedClassesRouteImport } from './routes/_authenticated/classes'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedReviewDeskRouteImport } from './routes/_authenticated/review-desk'
@@ -96,6 +98,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestRoute = TestRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TutorsRoute = TutorsRouteImport.update({
   id: '/tutors',
   path: '/tutors',
@@ -114,6 +121,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedAuditLogsRoute = AuthenticatedAuditLogsRouteImport.update({
   id: '/audit-logs',
   path: '/audit-logs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedClassesRoute = AuthenticatedClassesRouteImport.update({
+  id: '/classes',
+  path: '/classes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
@@ -185,10 +197,12 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/test': typeof TestRoute
   '/tutors': typeof TutorsRoute
   '/vault': typeof VaultRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/audit-logs': typeof AuthenticatedAuditLogsRoute
+  '/classes': typeof AuthenticatedClassesRoute
   '/me': typeof AuthenticatedMeRoute
   '/review': typeof AuthenticatedReviewRoute
   '/review-desk': typeof AuthenticatedReviewDeskRoute
@@ -213,10 +227,12 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/test': typeof TestRoute
   '/tutors': typeof TutorsRoute
   '/vault': typeof VaultRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/audit-logs': typeof AuthenticatedAuditLogsRoute
+  '/classes': typeof AuthenticatedClassesRoute
   '/me': typeof AuthenticatedMeRoute
   '/review': typeof AuthenticatedReviewRoute
   '/review-desk': typeof AuthenticatedReviewDeskRoute
@@ -243,10 +259,12 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/test': typeof TestRoute
   '/tutors': typeof TutorsRoute
   '/vault': typeof VaultRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/audit-logs': typeof AuthenticatedAuditLogsRoute
+  '/_authenticated/classes': typeof AuthenticatedClassesRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/review-desk': typeof AuthenticatedReviewDeskRoute
@@ -273,10 +291,12 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/test'
     | '/tutors'
     | '/vault'
     | '/admin'
     | '/audit-logs'
+    | '/classes'
     | '/me'
     | '/review'
     | '/review-desk'
@@ -301,10 +321,12 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/test'
     | '/tutors'
     | '/vault'
     | '/admin'
     | '/audit-logs'
+    | '/classes'
     | '/me'
     | '/review'
     | '/review-desk'
@@ -330,10 +352,12 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/test'
     | '/tutors'
     | '/vault'
     | '/_authenticated/admin'
     | '/_authenticated/audit-logs'
+    | '/_authenticated/classes'
     | '/_authenticated/me'
     | '/_authenticated/review'
     | '/_authenticated/review-desk'
@@ -360,6 +384,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  TestRoute: typeof TestRoute
   TutorsRoute: typeof TutorsRoute
   VaultRoute: typeof VaultRoute
   CodesIdRoute: typeof CodesIdRoute
@@ -455,6 +480,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tutors': {
       id: '/tutors'
       path: '/tutors'
@@ -481,6 +513,13 @@ declare module '@tanstack/react-router' {
       path: '/audit-logs'
       fullPath: '/audit-logs'
       preLoaderRoute: typeof AuthenticatedAuditLogsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/classes': {
+      id: '/_authenticated/classes'
+      path: '/classes'
+      fullPath: '/classes'
+      preLoaderRoute: typeof AuthenticatedClassesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/me': {
@@ -566,6 +605,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAuditLogsRoute: typeof AuthenticatedAuditLogsRoute
+  AuthenticatedClassesRoute: typeof AuthenticatedClassesRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedReviewDeskRoute: typeof AuthenticatedReviewDeskRoute
@@ -577,6 +617,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAuditLogsRoute: AuthenticatedAuditLogsRoute,
+  AuthenticatedClassesRoute: AuthenticatedClassesRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedReviewDeskRoute: AuthenticatedReviewDeskRoute,
@@ -601,6 +642,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  TestRoute: TestRoute,
   TutorsRoute: TutorsRoute,
   VaultRoute: VaultRoute,
   CodesIdRoute: CodesIdRoute,

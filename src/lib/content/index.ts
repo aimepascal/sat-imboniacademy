@@ -62,6 +62,7 @@ export interface LessonContent {
 export interface Lesson extends LessonSummary {
   content: LessonContent;
   content_rw: Partial<LessonContent>;
+  published: boolean;
   updated_at: string;
 }
 

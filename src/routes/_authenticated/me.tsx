@@ -10,6 +10,7 @@ import { useI18n, setLanguage, LANGUAGES } from "@/lib/i18n";
 const db = supabase as any;
 
 export const Route = createFileRoute("/_authenticated/me")({
+  validateSearch: (s: Record<string, unknown>): { code?: string } => (typeof s.code === "string" ? { code: s.code } : {}),
   head: () => ({ meta: [{ title: "Me | Imboni SAT Hub" }, { name: "robots", content: "noindex" }] }),
   component: Me,
 });
@@ -61,7 +62,22 @@ function Me() {
   });
 
   const [edit, setEdit] = useState(false);
-  const [classCode, setClassCode] = useState("");
+  const { code } = Route.useSearch();
+  const [classCode, setClassCode] = useState(code ?? "");
+  const assignments = useQuery({
+    queryKey: ["me-assignments", user.id],
+    queryFn: async () => {
+      const { data } = await db.rpc("my_assignments");
+      return (data ?? []) as { class_name: string; lesson_slug: string; lesson_name: string; due_date: string | null; done: boolean; score: number | null; total: number | null }[];
+    },
+  });
+  const tests = useQuery({
+    queryKey: ["me-tests", user.id],
+    queryFn: async () => {
+      const { data } = await db.from("practice_tests").select("section, score, created_at").order("created_at", { ascending: false }).limit(6);
+      return (data ?? []) as { section: string; score: number; created_at: string }[];
+    },
+  });
 
   const est = estimate.data;
   const rw = est?.sections.rw;
@@ -76,6 +92,7 @@ function Me() {
     else {
       toast.success("You joined the class.");
       setClassCode("");
+      void assignments.refetch();
     }
   };
   const download = async () => {
@@ -144,6 +161,27 @@ function Me() {
         {review.data?.due ? <Link to="/review" className="h-10 rounded-lg bg-primary px-4 font-semibold leading-10 text-primary-foreground">Review</Link> : null}
       </div>
 
+      {!!assignments.data?.length && (
+        <div className="mt-3 rounded-2xl border border-border bg-card p-5">
+          <b>From my teacher</b>
+          {assignments.data.map((a) => (
+            <Link key={a.class_name + a.lesson_slug} to="/learn/$slug" params={{ slug: a.lesson_slug }} search={{ tab: "practice" }} className="flex items-center gap-3 border-t border-border py-3 first-of-type:border-0">
+              <span className="flex-1 text-[15px]">{a.lesson_name}<span className="block text-xs text-muted-foreground">{a.class_name}{a.due_date ? ` · due ${a.due_date}` : ""}</span></span>
+              <span className="text-sm font-semibold text-primary">{a.total ? `${a.score}/${a.total}` : "Start"}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-3 rounded-2xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between"><b>Full practice tests</b><Link to="/test" className="text-sm font-semibold text-primary underline">Take a test</Link></div>
+        {!tests.data?.length ? <p className="mt-1 text-sm text-muted-foreground">Timed like test day, with an estimated score.</p> : (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {tests.data.map((t) => <span key={t.created_at} className="rounded-lg bg-secondary px-3 py-1.5 text-sm"><b>{t.score}</b> {t.section === "rw" ? "Reading and Writing" : "Math"} · {new Date(t.created_at).toLocaleDateString()}</span>)}
+          </div>
+        )}
+      </div>
+
       <h2 className="mb-3 mt-8 text-xl font-bold">Account</h2>
       <div className="rounded-2xl border border-border bg-card p-2">
         {edit ? (
@@ -172,7 +210,7 @@ function Me() {
         <p className="text-sm text-muted-foreground">Your teacher can give you a code to join their class.</p>
         <div className="mt-2 flex gap-2">
           <input value={classCode} onChange={(e) => setClassCode(e.target.value)} placeholder="Class code" className="h-10 flex-1 rounded-lg border border-border px-3 uppercase" aria-label="Class code" />
-          <button type="button" onClick={joinClass} disabled={classCode.trim().length < 4} className="h-10 rounded-lg bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-50">Join</button>
+          <button type="button" onClick={joinClass} disabled={classCode.trim().length < 6} className="h-10 rounded-lg bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-50">Join</button>
         </div>
       </div>
 

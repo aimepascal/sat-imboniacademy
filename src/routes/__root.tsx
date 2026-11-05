@@ -17,6 +17,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { registerAppServiceWorker } from "@/lib/pwa";
 import { trackPageView } from "@/lib/track";
+import { listenForErrors, reportError } from "@/lib/report-error";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
 import { BottomNav } from "@/components/BottomNav";
 import logoUrl from "@/assets/logo.png";
@@ -44,6 +45,7 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
+  useEffect(() => reportError(error), [error]);
   const router = useRouter();
 
   return (
@@ -112,6 +114,7 @@ function RootComponent() {
       <AuthSync />
       <ServiceWorkerRegistrar />
       <VisitCounter />
+      <ErrorListener />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
@@ -124,6 +127,11 @@ function RootComponent() {
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
+}
+
+function ErrorListener() {
+  useEffect(() => listenForErrors(), []);
+  return null;
 }
 
 function VisitCounter() {

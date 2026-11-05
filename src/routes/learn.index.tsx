@@ -43,6 +43,17 @@ function LearnHome() {
     },
   });
 
+  // Students who joined with Google skip the setup page; offer it here instead.
+  const setup = useQuery({
+    queryKey: ["onboarded", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any).from("profile_private").select("onboarded_at").eq("id", userId).maybeSingle();
+      return !!data?.onboarded_at;
+    },
+  });
+
   useEffect(() => {
     const h = window.location.hash.slice(1);
     if (OLD_HASH[h]) navigate({ to: OLD_HASH[h], replace: true });
@@ -60,6 +71,12 @@ function LearnHome() {
           <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-tight sm:text-4xl">
             {name.data ? `Good to see you, ${name.data.split(" ")[0]}.` : "Good to see you."}
           </h1>
+          {setup.data === false && (
+            <Link to="/welcome" className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <span className="flex-1"><b className="block">Set your goal and test date</b><span className="text-sm text-muted-foreground">One minute. Your daily plan fits your time.</span></span>
+              <span className="font-semibold text-primary">Start →</span>
+            </Link>
+          )}
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-border bg-card p-5">
               <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-bold text-primary">{lastL ? "Continue where you stopped" : "Start here"}</span>

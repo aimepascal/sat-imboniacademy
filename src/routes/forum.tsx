@@ -295,6 +295,8 @@ function NewPostForm({ userId, onDone }: { userId: string; onDone: () => void })
       const { data: created, error } = await supabase
         .from("forum_posts")
         .insert({
+          // Asked from a lesson page (/forum?lesson=prop): the thread links back to it.
+          lesson_slug: new URLSearchParams(window.location.search).get("lesson") || null,
           user_id: userId,
           title: title.trim().slice(0, 200),
           body: body.trim().slice(0, 5000),

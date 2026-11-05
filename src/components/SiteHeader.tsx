@@ -89,6 +89,7 @@ export function SiteHeader() {
   const moreLinks: { to: string; label: string }[] = [
     { to: "/codes", label: "Cheat codes" },
     { to: "/check", label: "10-minute check" },
+    { to: "/test", label: "Full practice test" },
     { to: "/tutors", label: "Tutors and mentors" },
     { to: "/impact", label: "Impact" },
   ];
@@ -97,6 +98,7 @@ export function SiteHeader() {
     { to: "/me", label: "My progress" },
     { to: "/today", label: "Today's plan" },
     ...(canReviewQuestions(roles) ? [{ to: "/review-desk", label: t("nav.reviewDesk") }] : []),
+    ...(roles?.includes("teacher") || isAdmin ? [{ to: "/classes", label: "My classes" }] : []),
     ...(isAdmin ? [{ to: "/admin", label: "Control Center" }] : []),
   ];
 
