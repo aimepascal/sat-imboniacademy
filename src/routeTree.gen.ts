@@ -12,21 +12,30 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CheckRouteImport } from './routes/check'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as ImpactRouteImport } from './routes/impact'
-import { Route as LearnRouteImport } from './routes/learn'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TutorsRouteImport } from './routes/tutors'
 import { Route as VaultRouteImport } from './routes/vault'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAuditLogsRouteImport } from './routes/_authenticated/audit-logs'
-import { Route as AuthenticatedPracticeRouteImport } from './routes/_authenticated/practice'
+import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
+import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedReviewDeskRouteImport } from './routes/_authenticated/review-desk'
 import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/today'
-import { Route as ApiLearnConfigDotjsRouteImport } from './routes/api/learn-config[.]js'
+import { Route as AuthenticatedWelcomeRouteImport } from './routes/_authenticated/welcome'
+import { Route as CodesIndexRouteImport } from './routes/codes.index'
+import { Route as CodesIdRouteImport } from './routes/codes.$id'
 import { Route as ForumPostIdRouteImport } from './routes/forum_.$postId'
+import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as AuthenticatedTodayPracticeRouteImport } from './routes/_authenticated/today_.practice'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +49,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckRoute = CheckRouteImport.update({
+  id: '/check',
+  path: '/check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -57,14 +71,14 @@ const ImpactRoute = ImpactRouteImport.update({
   path: '/impact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LearnRoute = LearnRouteImport.update({
-  id: '/learn',
-  path: '/learn',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PracticeRoute = PracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -72,9 +86,19 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TutorsRoute = TutorsRouteImport.update({
+  id: '/tutors',
+  path: '/tutors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VaultRoute = VaultRouteImport.update({
@@ -92,9 +116,14 @@ const AuthenticatedAuditLogsRoute = AuthenticatedAuditLogsRouteImport.update({
   path: '/audit-logs',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPracticeRoute = AuthenticatedPracticeRouteImport.update({
-  id: '/practice',
-  path: '/practice',
+const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReviewRoute = AuthenticatedReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReviewDeskRoute = AuthenticatedReviewDeskRouteImport.update({
@@ -107,9 +136,19 @@ const AuthenticatedTodayRoute = AuthenticatedTodayRouteImport.update({
   path: '/today',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiLearnConfigDotjsRoute = ApiLearnConfigDotjsRouteImport.update({
-  id: '/api/learn-config.js',
-  path: '/api/learn-config.js',
+const AuthenticatedWelcomeRoute = AuthenticatedWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const CodesIndexRoute = CodesIndexRouteImport.update({
+  id: '/codes/',
+  path: '/codes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodesIdRoute = CodesIdRouteImport.update({
+  id: '/codes/$id',
+  path: '/codes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForumPostIdRoute = ForumPostIdRouteImport.update({
@@ -117,141 +156,217 @@ const ForumPostIdRoute = ForumPostIdRouteImport.update({
   path: '/forum/$postId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTodayPracticeRoute =
+  AuthenticatedTodayPracticeRouteImport.update({
+    id: '/today_/practice',
+    path: '/today/practice',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/check': typeof CheckRoute
   '/dashboard': typeof DashboardRoute
   '/forum': typeof ForumRoute
   '/impact': typeof ImpactRoute
-  '/learn': typeof LearnRoute
   '/library': typeof LibraryRoute
+  '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tutors': typeof TutorsRoute
   '/vault': typeof VaultRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/audit-logs': typeof AuthenticatedAuditLogsRoute
-  '/practice': typeof AuthenticatedPracticeRoute
+  '/me': typeof AuthenticatedMeRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/review-desk': typeof AuthenticatedReviewDeskRoute
   '/today': typeof AuthenticatedTodayRoute
-  '/api/learn-config.js': typeof ApiLearnConfigDotjsRoute
+  '/welcome': typeof AuthenticatedWelcomeRoute
+  '/codes/$id': typeof CodesIdRoute
   '/forum/$postId': typeof ForumPostIdRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/codes/': typeof CodesIndexRoute
+  '/learn/': typeof LearnIndexRoute
+  '/today/practice': typeof AuthenticatedTodayPracticeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/check': typeof CheckRoute
   '/dashboard': typeof DashboardRoute
   '/forum': typeof ForumRoute
   '/impact': typeof ImpactRoute
-  '/learn': typeof LearnRoute
   '/library': typeof LibraryRoute
+  '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tutors': typeof TutorsRoute
   '/vault': typeof VaultRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/audit-logs': typeof AuthenticatedAuditLogsRoute
-  '/practice': typeof AuthenticatedPracticeRoute
+  '/me': typeof AuthenticatedMeRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/review-desk': typeof AuthenticatedReviewDeskRoute
   '/today': typeof AuthenticatedTodayRoute
-  '/api/learn-config.js': typeof ApiLearnConfigDotjsRoute
+  '/welcome': typeof AuthenticatedWelcomeRoute
+  '/codes/$id': typeof CodesIdRoute
   '/forum/$postId': typeof ForumPostIdRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/codes': typeof CodesIndexRoute
+  '/learn': typeof LearnIndexRoute
+  '/today/practice': typeof AuthenticatedTodayPracticeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/check': typeof CheckRoute
   '/dashboard': typeof DashboardRoute
   '/forum': typeof ForumRoute
   '/impact': typeof ImpactRoute
-  '/learn': typeof LearnRoute
   '/library': typeof LibraryRoute
+  '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tutors': typeof TutorsRoute
   '/vault': typeof VaultRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/audit-logs': typeof AuthenticatedAuditLogsRoute
-  '/_authenticated/practice': typeof AuthenticatedPracticeRoute
+  '/_authenticated/me': typeof AuthenticatedMeRoute
+  '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/review-desk': typeof AuthenticatedReviewDeskRoute
   '/_authenticated/today': typeof AuthenticatedTodayRoute
-  '/api/learn-config.js': typeof ApiLearnConfigDotjsRoute
+  '/_authenticated/welcome': typeof AuthenticatedWelcomeRoute
+  '/codes/$id': typeof CodesIdRoute
   '/forum_/$postId': typeof ForumPostIdRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/codes/': typeof CodesIndexRoute
+  '/learn/': typeof LearnIndexRoute
+  '/_authenticated/today_/practice': typeof AuthenticatedTodayPracticeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/check'
     | '/dashboard'
     | '/forum'
     | '/impact'
-    | '/learn'
     | '/library'
+    | '/practice'
     | '/privacy'
+    | '/sitemap.xml'
     | '/terms'
+    | '/tutors'
     | '/vault'
     | '/admin'
     | '/audit-logs'
-    | '/practice'
+    | '/me'
+    | '/review'
     | '/review-desk'
     | '/today'
-    | '/api/learn-config.js'
+    | '/welcome'
+    | '/codes/$id'
     | '/forum/$postId'
+    | '/learn/$slug'
+    | '/codes/'
+    | '/learn/'
+    | '/today/practice'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/check'
     | '/dashboard'
     | '/forum'
     | '/impact'
-    | '/learn'
     | '/library'
+    | '/practice'
     | '/privacy'
+    | '/sitemap.xml'
     | '/terms'
+    | '/tutors'
     | '/vault'
     | '/admin'
     | '/audit-logs'
-    | '/practice'
+    | '/me'
+    | '/review'
     | '/review-desk'
     | '/today'
-    | '/api/learn-config.js'
+    | '/welcome'
+    | '/codes/$id'
     | '/forum/$postId'
+    | '/learn/$slug'
+    | '/codes'
+    | '/learn'
+    | '/today/practice'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/check'
     | '/dashboard'
     | '/forum'
     | '/impact'
-    | '/learn'
     | '/library'
+    | '/practice'
     | '/privacy'
+    | '/sitemap.xml'
     | '/terms'
+    | '/tutors'
     | '/vault'
     | '/_authenticated/admin'
     | '/_authenticated/audit-logs'
-    | '/_authenticated/practice'
+    | '/_authenticated/me'
+    | '/_authenticated/review'
     | '/_authenticated/review-desk'
     | '/_authenticated/today'
-    | '/api/learn-config.js'
+    | '/_authenticated/welcome'
+    | '/codes/$id'
     | '/forum_/$postId'
+    | '/learn/$slug'
+    | '/codes/'
+    | '/learn/'
+    | '/_authenticated/today_/practice'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CheckRoute: typeof CheckRoute
   DashboardRoute: typeof DashboardRoute
   ForumRoute: typeof ForumRoute
   ImpactRoute: typeof ImpactRoute
-  LearnRoute: typeof LearnRoute
   LibraryRoute: typeof LibraryRoute
+  PracticeRoute: typeof PracticeRoute
   PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  TutorsRoute: typeof TutorsRoute
   VaultRoute: typeof VaultRoute
-  ApiLearnConfigDotjsRoute: typeof ApiLearnConfigDotjsRoute
+  CodesIdRoute: typeof CodesIdRoute
   ForumPostIdRoute: typeof ForumPostIdRoute
+  LearnSlugRoute: typeof LearnSlugRoute
+  CodesIndexRoute: typeof CodesIndexRoute
+  LearnIndexRoute: typeof LearnIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -277,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/check': {
+      id: '/check'
+      path: '/check'
+      fullPath: '/check'
+      preLoaderRoute: typeof CheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -298,18 +420,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImpactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/learn': {
-      id: '/learn'
-      path: '/learn'
-      fullPath: '/learn'
-      preLoaderRoute: typeof LearnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/library': {
       id: '/library'
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/practice': {
+      id: '/practice'
+      path: '/practice'
+      fullPath: '/practice'
+      preLoaderRoute: typeof PracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -319,11 +441,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tutors': {
+      id: '/tutors'
+      path: '/tutors'
+      fullPath: '/tutors'
+      preLoaderRoute: typeof TutorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vault': {
@@ -347,11 +483,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuditLogsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/practice': {
-      id: '/_authenticated/practice'
-      path: '/practice'
-      fullPath: '/practice'
-      preLoaderRoute: typeof AuthenticatedPracticeRouteImport
+    '/_authenticated/me': {
+      id: '/_authenticated/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof AuthenticatedMeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/review': {
+      id: '/_authenticated/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof AuthenticatedReviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/review-desk': {
@@ -368,11 +511,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTodayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/learn-config.js': {
-      id: '/api/learn-config.js'
-      path: '/api/learn-config.js'
-      fullPath: '/api/learn-config.js'
-      preLoaderRoute: typeof ApiLearnConfigDotjsRouteImport
+    '/_authenticated/welcome': {
+      id: '/_authenticated/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AuthenticatedWelcomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/codes/': {
+      id: '/codes/'
+      path: '/codes'
+      fullPath: '/codes/'
+      preLoaderRoute: typeof CodesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/codes/$id': {
+      id: '/codes/$id'
+      path: '/codes/$id'
+      fullPath: '/codes/$id'
+      preLoaderRoute: typeof CodesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forum_/$postId': {
@@ -382,23 +539,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForumPostIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn/': {
+      id: '/learn/'
+      path: '/learn'
+      fullPath: '/learn/'
+      preLoaderRoute: typeof LearnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/today_/practice': {
+      id: '/_authenticated/today_/practice'
+      path: '/today/practice'
+      fullPath: '/today/practice'
+      preLoaderRoute: typeof AuthenticatedTodayPracticeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAuditLogsRoute: typeof AuthenticatedAuditLogsRoute
-  AuthenticatedPracticeRoute: typeof AuthenticatedPracticeRoute
+  AuthenticatedMeRoute: typeof AuthenticatedMeRoute
+  AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedReviewDeskRoute: typeof AuthenticatedReviewDeskRoute
   AuthenticatedTodayRoute: typeof AuthenticatedTodayRoute
+  AuthenticatedWelcomeRoute: typeof AuthenticatedWelcomeRoute
+  AuthenticatedTodayPracticeRoute: typeof AuthenticatedTodayPracticeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAuditLogsRoute: AuthenticatedAuditLogsRoute,
-  AuthenticatedPracticeRoute: AuthenticatedPracticeRoute,
+  AuthenticatedMeRoute: AuthenticatedMeRoute,
+  AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedReviewDeskRoute: AuthenticatedReviewDeskRoute,
   AuthenticatedTodayRoute: AuthenticatedTodayRoute,
+  AuthenticatedWelcomeRoute: AuthenticatedWelcomeRoute,
+  AuthenticatedTodayPracticeRoute: AuthenticatedTodayPracticeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -408,16 +592,22 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CheckRoute: CheckRoute,
   DashboardRoute: DashboardRoute,
   ForumRoute: ForumRoute,
   ImpactRoute: ImpactRoute,
-  LearnRoute: LearnRoute,
   LibraryRoute: LibraryRoute,
+  PracticeRoute: PracticeRoute,
   PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  TutorsRoute: TutorsRoute,
   VaultRoute: VaultRoute,
-  ApiLearnConfigDotjsRoute: ApiLearnConfigDotjsRoute,
+  CodesIdRoute: CodesIdRoute,
   ForumPostIdRoute: ForumPostIdRoute,
+  LearnSlugRoute: LearnSlugRoute,
+  CodesIndexRoute: CodesIndexRoute,
+  LearnIndexRoute: LearnIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

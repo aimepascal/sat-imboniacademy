@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import { toast } from "sonner";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { SignInGate } from "@/components/SignInGate";
 import { AttachmentPicker } from "@/components/AttachmentPicker";
-import { generateForumAiReply } from "@/lib/forum-ai.functions";
 import type { FileAttachment } from "@/lib/forum-attachments";
 import type { VideoAttachment } from "@/lib/forum-video";
 
@@ -283,7 +281,6 @@ function ForumPage() {
 
 function NewPostForm({ userId, onDone }: { userId: string; onDone: () => void }) {
   const qc = useQueryClient();
-  const generateAiReply = useServerFn(generateForumAiReply);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [topic, setTopic] = useState("General");
@@ -315,14 +312,6 @@ function NewPostForm({ userId, onDone }: { userId: string; onDone: () => void })
       qc.invalidateQueries({ queryKey: ["forum-posts"] });
       toast.success("Question posted");
       onDone();
-      // Fire-and-forget: the AI tutor's first-pass answer appears in the
-      // thread a few seconds later. Not awaited so it never blocks or fails
-      // the post itself.
-      if (postId) {
-        generateAiReply({ data: { postId } }).catch((err) => {
-          console.error("AI forum reply failed", err);
-        });
-      }
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });

@@ -18,22 +18,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { registerAppServiceWorker } from "@/lib/pwa";
 import { trackPageView } from "@/lib/track";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
+import { BottomNav } from "@/components/BottomNav";
+import logoUrl from "@/assets/logo.png";
 import { useLocation } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-display text-7xl font-semibold tracking-tight">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist.
-        </p>
-        <div className="mt-6">
-          <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
-            Go home
-          </Link>
-        </div>
+    <div className="mx-auto max-w-md px-4 py-16 text-center">
+      <img src={logoUrl} alt="" width={64} height={64} className="mx-auto h-16 w-16" />
+      <h1 className="mt-4 text-3xl font-bold tracking-tight">This page is not here</h1>
+      <p className="mt-2 text-muted-foreground">The link may be old. These will help you keep studying.</p>
+      <div className="mt-6 flex flex-col gap-2">
+        <Link to="/learn" className="h-11 rounded-xl bg-primary font-bold leading-[44px] text-primary-foreground">Go to Learn</Link>
+        <Link to="/library" className="h-11 rounded-xl border border-primary font-semibold leading-[44px] text-primary">Search the library</Link>
+      </div>
+      <div className="mt-6 rounded-2xl border border-border bg-card p-4 text-left">
+        <b className="text-sm">Popular lessons</b>
+        {[["le1", "Linear equations in one variable"], ["bd", "Boundaries"], ["pc", "Percentages"]].map(([slug, name]) => (
+          <Link key={slug} to="/learn/$slug" params={{ slug }} className="flex justify-between border-t border-border py-3 text-[15px] first-of-type:border-0">{name}<span className="text-muted-foreground">›</span></Link>
+        ))}
       </div>
     </div>
   );
@@ -114,10 +117,9 @@ function RootComponent() {
         <main className="flex-1">
           <Outlet />
         </main>
-        <SiteFooter />
+        <div className="pb-16 lg:pb-0"><SiteFooter /></div>
       </div>
-      {/* The floating "AI tutor" button was removed: it covered content on phones.
-          Its code is still in src/components/AITutorChat.tsx if you want it back. */}
+      <BottomNav />
       <PrivacyNotice />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>

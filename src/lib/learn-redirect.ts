@@ -1,25 +1,22 @@
 import { redirect } from "@tanstack/react-router";
 
-// /learn (public/learn) replaced the old home, Explore/Dashboard and Vault
-// pages. Their routes stay only to send visitors there: a server redirect for
-// direct visits and bookmarks, and a full-page redirect for in-app links
-// (/learn is a static page, not a router route).
+// Old pages that now live somewhere else. Each keeps its route only to send
+// visitors on: a server redirect for direct visits and bookmarks, and a router
+// redirect for links inside the app.
 export const LEARN_PATH = "/learn";
 
-// `section` opens one part of /learn, e.g. "library" -> /learn#library.
-export function redirectToLearn(status: 301 | 302, section?: string) {
-  const hash = section ? `#${section}` : "";
+export function redirectTo(to: string, status: 301 | 302) {
   return {
     server: {
       handlers: {
         GET: ({ request }: { request: Request }) => {
           const { search } = new URL(request.url);
-          return new Response(null, { status, headers: { location: LEARN_PATH + search + hash } });
+          return new Response(null, { status, headers: { location: to + search } });
         },
       },
     },
     beforeLoad: () => {
-      throw redirect({ href: LEARN_PATH + hash, reloadDocument: true });
+      throw redirect({ to });
     },
   };
 }

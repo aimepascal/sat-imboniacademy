@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Sparkles, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
+import logoUrl from "@/assets/logo.png";
 
 const authSearchSchema = z.object({
   mode: z.enum(["login", "signup", "forgot", "reset"]).optional(),
@@ -64,7 +65,6 @@ function AuthPage() {
         const { error } = await supabase.auth.updateUser({ password: pw });
         if (error) throw error;
         toast.success("Password updated. You are signed in.");
-        // /learn is a static page, so a full page load, not navigate().
         window.location.assign(LEARN_PATH);
       } else if (mode === "signup") {
         const schema = z.object({
@@ -77,19 +77,17 @@ function AuthPage() {
           email: data.email,
           password: data.password,
           options: {
-            emailRedirectTo: `${window.location.origin}${LEARN_PATH}`,
+            emailRedirectTo: `${window.location.origin}/welcome`,
             data: { display_name: data.displayName },
           },
         });
         if (error) throw error;
-        toast.success("Account created! Welcome aboard.");
-        // /learn is a static page, so a full page load, not navigate().
-        window.location.assign(LEARN_PATH);
+        toast.success("Account created. Welcome!");
+        window.location.assign("/welcome");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back.");
-        // /learn is a static page, so a full page load, not navigate().
         window.location.assign(LEARN_PATH);
       }
     } catch (err) {
@@ -122,11 +120,8 @@ function AuthPage() {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <a href={LEARN_PATH} className="inline-flex items-center gap-2 font-display text-lg font-semibold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Sparkles className="h-4 w-4" />
-            </span>
-            Imboni SAT Hub
+          <a href={LEARN_PATH} className="inline-flex flex-col items-center gap-2 font-display text-lg font-semibold" aria-label="Imboni SAT Hub">
+            <img src={logoUrl} alt="" width={56} height={56} className="h-14 w-14" />
           </a>
         </div>
 
@@ -135,12 +130,13 @@ function AuthPage() {
             {mode === "signup" ? "Create your account" : mode === "forgot" ? "Forgot your password?" : mode === "reset" ? "Choose a new password" : "Welcome back"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signup" ? "Free forever. No credit card." : mode === "forgot" ? "Enter your email and we will send you a reset link." : mode === "reset" ? "Pick a password you will remember (at least 6 characters)." : "Sign in to keep studying smart."}
+            {mode === "signup" ? "Save your progress and get a daily plan. Free." : mode === "forgot" ? "Enter your email and we will send you a reset link." : mode === "reset" ? "Pick a password you will remember (at least 6 characters)." : "Sign in to continue where you stopped."}
           </p>
 
           {(mode === "login" || mode === "signup") && (
             <>
               <Button type="button" variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={loading}>
+                <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4" aria-hidden><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>
                 Continue with Google
               </Button>
 
@@ -158,7 +154,7 @@ function AuthPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="displayName">Display name</Label>
+                <Label htmlFor="displayName">Your name</Label>
                 <Input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required maxLength={80} />
               </div>
             )}
@@ -189,6 +185,11 @@ function AuthPage() {
             </Button>
           </form>
 
+          {mode === "signup" && (
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              By joining you accept the <a href="/terms" className="underline">Terms</a> and <a href="/privacy" className="underline">Privacy Policy</a>. Under 16? Ask a parent or teacher first.
+            </p>
+          )}
           {mode === "forgot" || mode === "reset" ? (
             <p className="mt-5 text-center text-sm text-muted-foreground">
               <button onClick={() => setMode("login")} className="font-medium text-primary hover:underline">Back to sign in</button>

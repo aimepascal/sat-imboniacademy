@@ -48,8 +48,9 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@supabase/supabase-js": "^2.106.2",
     "@tailwindcss/vite": "^4.2.1",
-    "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-query": "5.102.0",
     "@tanstack/react-router": "^1.170.41",
+    "@tanstack/react-router-ssr-query": "1.167.3",
     "@tanstack/react-start": "^1.168.60",
     "@tanstack/router-plugin": "^1.168.42",
     "ai": "^7.0.93",
@@ -93,5 +94,8 @@
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
     "workbox-build": "^7.4.1"
+  },
+  "overrides": {
+    "@tanstack/query-core": "5.102.0"
   }
 }

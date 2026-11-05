@@ -3,7 +3,9 @@ Allow: /
 Disallow: /admin
 Disallow: /auth
 Disallow: /today
-Disallow: /practice
+Disallow: /me
+Disallow: /review
+Disallow: /welcome
 Disallow: /review-desk
 Disallow: /audit-logs
 

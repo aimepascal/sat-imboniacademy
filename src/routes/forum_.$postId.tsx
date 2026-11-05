@@ -292,7 +292,7 @@ function ThreadPage() {
         <ul className="mt-5 space-y-4">
           {replies.map((r) => {
             const isAi = r.is_ai_generated;
-            const rAuthor = isAi ? "AI Tutor" : (r.profiles?.display_name ?? "Student");
+            const rAuthor = isAi ? "Imboni helper" : (r.profiles?.display_name ?? "Student");
             return (
               <li
                 key={r.id}

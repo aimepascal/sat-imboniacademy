@@ -124,7 +124,7 @@ function Today() {
               <p className="mt-5 text-sm font-medium">{t("today.done")}</p>
             ) : (
               <Button size="lg" className="mt-5 w-full" asChild>
-                <Link to="/practice">
+                <Link to="/today/practice">
                   {done === 0 ? t("today.start") : t("today.continue")}
                   <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { redirectToLearn } from "@/lib/learn-redirect";
+import { redirectTo } from "@/lib/learn-redirect";
 
-// The Cheat Code Vault was replaced by /learn (cheat codes and library).
-export const Route = createFileRoute("/vault")(redirectToLearn(301));
+// The old Cheat Code Vault: its guides are now in the Library.
+export const Route = createFileRoute("/vault")(redirectTo("/library", 301));
