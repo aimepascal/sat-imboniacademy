@@ -1,0 +1,22 @@
+name: Apply pascal-v2
+on:
+  push:
+    branches: [pascal-apply]
+    paths: [pascal.b64]
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: pascal-apply
+      - name: Create branch pascal-v2 from the bundle
+        run: |
+          git fetch origin main
+          base64 -d pascal.b64 > /tmp/p.bundle
+          git bundle verify /tmp/p.bundle
+          git fetch /tmp/p.bundle pascal-v2:pascal-v2
+          git push origin pascal-v2
