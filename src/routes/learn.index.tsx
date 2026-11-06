@@ -70,7 +70,7 @@ function LearnHome() {
         <>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Murakaza neza")}</p>
           <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-tight sm:text-4xl">
-            {name.data ? `Good to see you, ${name.data.split(" ")[0]}.` : tr("Good to see you.")}
+            {name.data ? tr("Good to see you, {name}.", { name: name.data.split(" ")[0] }) : tr("Good to see you.")}
           </h1>
           {setup.data === false && (
             <Link to="/welcome" className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
@@ -84,13 +84,13 @@ function LearnHome() {
               {lastL ? (
                 <>
                   <p className="mt-3 text-lg font-bold">{lastL.name}</p>
-                  <p className="text-sm text-muted-foreground">{lastP?.last_total ? `Last practice: ${lastP.last_score} of ${lastP.last_total}` : lastP?.done ? "Marked as done" : "Lesson opened"}</p>
+                  <p className="text-sm text-muted-foreground">{lastP?.last_total ? tr("Last practice: {a} of {b}", { a: lastP.last_score ?? 0, b: lastP.last_total }) : lastP?.done ? tr("Marked as done") : tr("Lesson opened")}</p>
                   <Link to="/learn/$slug" params={{ slug: lastL.slug }} search={lastP?.last_total ? { tab: "practice" } : {}} className="mt-4 block h-11 rounded-xl bg-primary text-center font-bold leading-[44px] text-primary-foreground">{tr("Continue")}</Link>
                 </>
               ) : (
                 <>
                   <p className="mt-3 text-lg font-bold">{tr("Take the 10-minute check")}</p>
-                  <p className="text-sm text-muted-foreground">8 questions, one from each part. It shows where to start.</p>
+                  <p className="text-sm text-muted-foreground">{tr("8 questions, one from each part. It shows where to start.")}</p>
                   <Link to="/check" className="mt-4 block h-11 rounded-xl bg-primary text-center font-bold leading-[44px] text-primary-foreground">{tr("Start the check")}</Link>
                 </>
               )}
@@ -109,7 +109,7 @@ function LearnHome() {
         <>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Free SAT prep")}</p>
           <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-tight sm:text-4xl">{tr("Learn the SAT one part at a time.")}</h1>
-          <p className="mt-2 text-muted-foreground">{lessons.length} lessons, {lessons.length * 16} practice questions and cheat codes for every part. Free.</p>
+          <p className="mt-2 text-muted-foreground">{tr("{a} lessons, {b} practice questions and cheat codes for every part. Free.", { a: lessons.length, b: lessons.length * 16 })}</p>
           <div className="mt-4 rounded-2xl bg-primary p-5 text-primary-foreground">
             <p className="text-lg font-bold">{tr("Not sure where to start?")}</p>
             <p className="mt-1 text-primary-foreground/80">{tr("Take a 10-minute check. It shows the parts that cost you the most points.")}</p>
@@ -126,8 +126,8 @@ function LearnHome() {
           return (
             <a key={p.id} href={`#${p.id}`} className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
               <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-bold text-primary">{tr(p.name)}</span>
-              <b className="mt-2 block">{p.domains.length} parts · {n} skills</b>
-              <p className="mt-1 text-[13px] leading-snug text-muted-foreground">{userId ? `${done} done` : p.domains.map((d) => d.name).join(", ")}</p>
+              <b className="mt-2 block">{tr("{a} parts · {b} skills", { a: p.domains.length, b: n })}</b>
+              <p className="mt-1 text-[13px] leading-snug text-muted-foreground">{userId ? tr("{n} done", { n: done }) : p.domains.map((d) => tr(d.name)).join(", ")}</p>
             </a>
           );
         })}
@@ -162,9 +162,9 @@ function LearnHome() {
                       <Link key={l.slug} to="/learn/$slug" params={{ slug: l.slug }} className="rounded-xl border border-border bg-card p-3.5 hover:border-primary">
                         <span className="flex items-start justify-between gap-2">
                           <b className="text-[15px] leading-snug">{l.name}</b>
-                          {pr?.done ? <span className="text-xs font-bold text-emerald-700">✓ Done</span> : pr?.last_total ? <span className="text-xs font-semibold text-muted-foreground">{pr.last_score}/{pr.last_total}</span> : null}
+                          {pr?.done ? <span className="text-xs font-bold text-emerald-700">✓ {tr("Done")}</span> : pr?.last_total ? <span className="text-xs font-semibold text-muted-foreground">{pr.last_score}/{pr.last_total}</span> : null}
                         </span>
-                        <span className="mt-1 block text-[13px] leading-snug text-muted-foreground">{l.parent_slug ? "Part of Ratios, rates and units · " : ""}{l.summary}</span>
+                        <span className="mt-1 block text-[13px] leading-snug text-muted-foreground">{l.parent_slug ? `${tr("Part of Ratios, rates and units")} · ` : ""}{l.summary}</span>
                       </Link>
                     );
                   })}

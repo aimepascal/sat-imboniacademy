@@ -56,11 +56,11 @@ function Check() {
   if (i === -1)
     return (
       <div className="mx-auto max-w-xl px-4 py-8">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">10-minute check</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("10-minute check")}</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">{tr("Where should you start?")}</h1>
-        <p className="mt-2 text-muted-foreground">8 questions, one from each part of the SAT, at medium level. No clock. At the end you see which parts to study first.</p>
+        <p className="mt-2 text-muted-foreground">{tr("8 questions, one from each part of the SAT, at medium level. No clock. At the end you see which parts to study first.")}</p>
         <button type="button" disabled={!items.data} onClick={() => setI(0)} className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary font-bold text-primary-foreground disabled:opacity-60">
-          {!items.data && <Loader2 className="h-4 w-4 animate-spin" />} Start
+          {!items.data && <Loader2 className="h-4 w-4 animate-spin" />} {tr("Start")}
         </button>
       </div>
     );
@@ -70,8 +70,8 @@ function Check() {
     const weak = list.filter((x) => !score[x.domain]);
     return (
       <div className="mx-auto max-w-xl px-4 py-8">
-        <h1 className="text-3xl font-bold tracking-tight">You got {list.length - weak.length} of {list.length}</h1>
-        <p className="mt-2 text-muted-foreground">{weak.length ? "Start with these parts. Each one has a lesson, 16 questions and cheat codes." : "Strong start. Go to the harder questions in Round 2 of each lesson."}</p>
+        <h1 className="text-3xl font-bold tracking-tight">{tr("You got {a} of {b}", { a: list.length - weak.length, b: list.length })}</h1>
+        <p className="mt-2 text-muted-foreground">{weak.length ? tr("Start with these parts. Each one has a lesson, 16 questions and cheat codes.") : tr("Strong start. Go to the harder questions in Round 2 of each lesson.")}</p>
         <div className="mt-5 space-y-2">
           {list.map((x) => {
             const d = domains.find((dd) => dd.id === x.domain)!;
@@ -79,13 +79,13 @@ function Check() {
             return (
               <Link key={x.domain} to="/learn/$slug" params={{ slug: x.lesson }} className={cn("flex items-center gap-3 rounded-xl border bg-card p-3.5", ok ? "border-border" : "border-amber-300 bg-amber-50")}>
                 <span className={cn("grid h-7 w-7 place-items-center rounded-full text-sm font-bold text-white", ok ? "bg-emerald-600" : "bg-amber-500")}>{ok ? "✓" : "!"}</span>
-                <span className="flex-1"><b className="block text-[15px]">{tr(d.name)}</b><span className="text-xs text-muted-foreground">{d.part} · {d.pct} of the section</span></span>
+                <span className="flex-1"><b className="block text-[15px]">{tr(d.name)}</b><span className="text-xs text-muted-foreground">{tr(d.part)} · {tr("{pct} of the section", { pct: d.pct })}</span></span>
                 <span className="text-sm font-semibold text-primary">{ok ? tr("Review") : tr("Start here")} →</span>
               </Link>
             );
           })}
         </div>
-        {!userId && <p className="mt-6 rounded-xl bg-secondary p-4 text-sm"><Link to="/auth" className="font-bold text-primary underline">{tr("Create a free account")}</Link> to save this result and get a daily plan from it.</p>}
+        {!userId && <p className="mt-6 rounded-xl bg-secondary p-4 text-sm"><Link to="/auth" className="font-bold text-primary underline">{tr("Create a free account")}</Link> {tr("to save this result and get a daily plan from it.")}</p>}
       </div>
     );
   }
@@ -110,8 +110,8 @@ function Check() {
   return (
     <div className="mx-auto max-w-xl space-y-4 px-4 py-6">
       <div className="flex justify-between text-sm font-semibold text-muted-foreground">
-        <span>{domains.find((d) => d.id === cur.domain)?.name}</span>
-        <span>Question {i + 1} of {list.length}</span>
+        <span>{tr(domains.find((d) => d.id === cur.domain)?.name ?? "")}</span>
+        <span>{tr("Question {a} of {b}", { a: i + 1, b: list.length })}</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${(100 * (i + (check ? 1 : 0))) / list.length}%` }} /></div>
       <QuestionBody q={cur.q} lang={language} />
@@ -127,7 +127,7 @@ function Check() {
       </div>
       {check && (
         <>
-          <div className="rounded-xl border border-border bg-card p-4 text-[15px]"><b>{check.correct ? "Correct. " : tr("Not quite. ")}</b>The answer is {letter(check.answer)}. {pick(language, check.why, check.why_rw)}</div>
+          <div className="rounded-xl border border-border bg-card p-4 text-[15px]"><b>{check.correct ? tr("Correct. ") : tr("Not quite. ")}</b>{tr("The answer is {x}.", { x: letter(check.answer) })} {pick(language, check.why, check.why_rw)}</div>
           <button type="button" onClick={nextQ} className="h-11 w-full rounded-xl bg-primary font-bold text-primary-foreground">{i === list.length - 1 ? tr("See my result") : tr("Next question")}</button>
         </>
       )}

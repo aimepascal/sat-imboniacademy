@@ -44,7 +44,7 @@ function PracticeHome() {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link to="/check" className="rounded-2xl bg-primary p-4 text-primary-foreground">
-          <b className="block">10-minute check</b>
+          <b className="block">{tr("10-minute check")}</b>
           <span className="text-sm text-primary-foreground/80">{tr("One question from each part. Find your weak spots.")}</span>
         </Link>
         <Link to="/test" className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
@@ -53,11 +53,11 @@ function PracticeHome() {
         </Link>
         <Link to={userId ? "/today" : "/auth"} className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
           <b className="block">{tr("Today's plan")}</b>
-          <span className="text-sm text-muted-foreground">{userId ? "Short practice from your weakest skills." : "Sign in to get a daily plan."}</span>
+          <span className="text-sm text-muted-foreground">{userId ? tr("Short practice from your weakest skills.") : tr("Sign in to get a daily plan.")}</span>
         </Link>
         <Link to={userId ? "/me" : "/auth"} className="rounded-2xl border border-border bg-card p-4 hover:border-primary">
-          <b className="block">Mistake notebook{due.data ? ` · ${due.data} due` : ""}</b>
-          <span className="text-sm text-muted-foreground">{userId ? "Questions you missed come back until you get them right." : "Sign in to keep the questions you miss."}</span>
+          <b className="block">{tr("Mistake notebook")}{due.data ? ` · ${tr("{n} due", { n: due.data })}` : ""}</b>
+          <span className="text-sm text-muted-foreground">{userId ? tr("Questions you missed come back until you get them right.") : tr("Sign in to keep the questions you miss.")}</span>
         </Link>
       </div>
 
@@ -72,7 +72,7 @@ function PracticeHome() {
                 <div key={d.id} className="rounded-2xl border border-border bg-card p-4">
                   <div className="flex items-baseline justify-between gap-2">
                     <h3 className="font-bold">{tr(d.name)}</h3>
-                    <span className="text-xs text-muted-foreground">{d.pct} · {tried}/{list.length} practised</span>
+                    <span className="text-xs text-muted-foreground">{d.pct} · {tr("{a}/{b} practised", { a: tried, b: list.length })}</span>
                   </div>
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${(100 * tried) / Math.max(1, list.length)}%` }} /></div>
                   <ul className="mt-3 divide-y divide-border">
