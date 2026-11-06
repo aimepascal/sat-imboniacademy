@@ -19,6 +19,7 @@ import {
   type UniversalCode,
 } from "@/lib/content";
 import { QuestionBody, LEVEL_STYLE } from "./QuestionBody";
+import { tr } from "@/lib/i18n/tr";
 
 const fmt = (t: number) => {
   t = Math.max(0, Math.round(t));
@@ -145,13 +146,13 @@ export function PracticePanel(props: {
   if (questions.isLoading)
     return <p className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading questions…</p>;
   if (questions.isError || all.length === 0)
-    return <p className="text-muted-foreground">The questions for this lesson are not available right now. Try again in a moment.</p>;
+    return <p className="text-muted-foreground">{tr("The questions for this lesson are not available right now. Try again in a moment.")}</p>;
 
   const modeToggle = (
     <div className="inline-flex rounded-lg border border-border bg-card p-0.5 text-sm font-semibold" role="group" aria-label="Clock">
       {[
-        [true, "Timed"],
-        [false, "Free"],
+        [true, tr("Timed")],
+        [false, tr("Free")],
       ].map(([v, label]) => (
         <button
           key={String(v)}
@@ -171,7 +172,7 @@ export function PracticePanel(props: {
       <div id="practice-top" className="space-y-4">
         <div className="rounded-2xl border border-border bg-card p-5">
           <p className="font-semibold">{all.length} questions in two rounds of 8</p>
-          <p className="mt-1 text-sm text-muted-foreground">Each round goes easy, medium, hard, very hard, two of each.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{tr("Each round goes easy, medium, hard, very hard, two of each.")}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <div className="inline-flex rounded-lg border border-border bg-card p-0.5 text-sm font-semibold" role="group" aria-label="Round">
               {[0, 1].map((r) => (
@@ -183,13 +184,13 @@ export function PracticePanel(props: {
             {modeToggle}
           </div>
           <button type="button" onClick={() => start()} className="mt-5 h-11 w-full rounded-xl bg-primary px-5 font-bold text-primary-foreground sm:w-auto">
-            Start practice
+            {tr("Start practice")}
           </button>
         </div>
         <details className="rounded-2xl border border-border bg-card p-5 text-sm leading-relaxed">
-          <summary className="cursor-pointer font-semibold">How the clock works</summary>
+          <summary className="cursor-pointer font-semibold">{tr("How the clock works")}</summary>
           <p className="mt-3">On the real SAT you have about <b>{fmt(secondsPerQuestion(section))}</b> for each question ({minutes}). The clock here counts down from that time.</p>
-          <p className="mt-2">Seconds you do not use move to the next question. Prefer no clock? Choose <b>Free</b>. Speed comes after you understand.</p>
+          <p className="mt-2">Seconds you do not use move to the next question. Prefer no clock? Choose <b>{tr("Free")}</b>. Speed comes after you understand.</p>
         </details>
         <OfficialLinks section={section} />
       </div>
@@ -209,7 +210,7 @@ export function PracticePanel(props: {
     return (
       <div id="practice-top" className="rounded-2xl border border-border bg-card p-6 text-center">
         <p className="text-4xl" aria-hidden>{perfect ? "🏆" : correct >= 5 ? "👏" : "💪"}</p>
-        <h3 className="mt-2 text-xl font-bold">{perfect ? "Perfect score!" : correct >= 5 ? "Well done!" : "Good work. Keep going."}</h3>
+        <h3 className="mt-2 text-xl font-bold">{perfect ? tr("Perfect score!") : correct >= 5 ? tr("Well done!") : tr("Good work. Keep going.")}</h3>
         <p className="mt-1 text-lg">You got <b>{correct} of {results.length}</b> right.</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm">
           {["easy", "medium", "hard", "very hard"].map((l) => (
@@ -223,11 +224,11 @@ export function PracticePanel(props: {
           {perfect ? "Mark this lesson as done and open the next one." : "Read the explanations again, look at the cheat codes, and try once more. Correct first, then fast."}
         </p>
         {userId && !perfect && <p className="mt-2 text-sm">The questions you missed are in your <Link to="/me" className="font-semibold text-primary underline">mistake notebook</Link>.</p>}
-        {!userId && <p className="mt-2 text-sm"><Link to="/auth" className="font-semibold text-primary underline">Create a free account</Link> to keep your scores and get missed questions back later.</p>}
+        {!userId && <p className="mt-2 text-sm"><Link to="/auth" className="font-semibold text-primary underline">{tr("Create a free account")}</Link> to keep your scores and get missed questions back later.</p>}
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={() => start(round)} className="h-10 rounded-lg border border-primary px-4 font-semibold text-primary">Try this round again</button>
+          <button type="button" onClick={() => start(round)} className="h-10 rounded-lg border border-primary px-4 font-semibold text-primary">{tr("Try this round again")}</button>
           <button type="button" onClick={() => start(round === 0 ? 1 : 0)} className="h-10 rounded-lg bg-primary px-4 font-semibold text-primary-foreground">
-            {round === 0 ? "Start Round 2" : "Back to Round 1"}
+            {round === 0 ? tr("Start Round 2") : tr("Back to Round 1")}
           </button>
         </div>
       </div>
@@ -285,8 +286,8 @@ export function PracticePanel(props: {
                 {letter(k)}
               </span>
               <span className="flex-1">{o}</span>
-              {isRight && <span className="text-sm font-bold text-emerald-700">Correct</span>}
-              {isWrongPick && <span className="text-sm font-bold text-rose-700">Your answer</span>}
+              {isRight && <span className="text-sm font-bold text-emerald-700">{tr("Correct")}</span>}
+              {isWrongPick && <span className="text-sm font-bold text-rose-700">{tr("Your answer")}</span>}
               {checking && picked === k && <Loader2 className="h-4 w-4 animate-spin" />}
             </button>
           );
@@ -296,8 +297,8 @@ export function PracticePanel(props: {
       {(check || timeUp) && (
         <div className="space-y-3">
           <div className="rounded-xl border border-border bg-card p-4 text-[15px] leading-relaxed">
-            <b>{timeUp ? "Time is up. " : check?.correct ? "Correct! " : "Not quite. "}</b>
-            {check && <>The answer is <b>{letter(check.answer)}</b>. {pick(props.lang, check.why, check.why_rw)}</>}
+            <b>{timeUp ? tr("Time is up. ") : check?.correct ? tr("Correct! ") : tr("Not quite. ")}</b>
+            {check && <>{tr("The answer is")} <b>{letter(check.answer)}</b>. {pick(props.lang, check.why, check.why_rw)}</>}
             {codes.length > 0 && (
               <p className="mt-2 text-sm text-muted-foreground">
                 A cheat code that helps here:{" "}
@@ -309,24 +310,24 @@ export function PracticePanel(props: {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <button type="button" onClick={next} className="h-11 flex-1 rounded-xl bg-primary px-5 font-bold text-primary-foreground sm:flex-none">
-              {i === set.length - 1 ? "See my result" : "Next question"}
+              {i === set.length - 1 ? tr("See my result") : tr("Next question")}
             </button>
-            <Link to="/forum" className="h-11 rounded-xl border border-primary px-4 font-semibold leading-[44px] text-primary">Ask the forum</Link>
+            <Link to="/forum" className="h-11 rounded-xl border border-primary px-4 font-semibold leading-[44px] text-primary">{tr("Ask the forum")}</Link>
             <button type="button" onClick={() => setReporting((v) => !v)} className="ml-auto flex items-center gap-1 text-sm font-semibold text-muted-foreground">
-              <Flag className="h-4 w-4" /> Report a problem
+              <Flag className="h-4 w-4" /> {tr("Report a problem")}
             </button>
           </div>
           {reporting && (
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
               {userId ? (
                 <>
-                  <label className="text-sm font-semibold" htmlFor="report">What is wrong with this question?</label>
+                  <label className="text-sm font-semibold" htmlFor="report">{tr("What is wrong with this question?")}</label>
                   <textarea id="report" value={reportText} onChange={(e) => setReportText(e.target.value)} maxLength={600} rows={3}
                     className="mt-2 w-full rounded-lg border border-border bg-white p-2 text-sm" placeholder="For example: I think the answer should be C, because…" />
-                  <button type="button" onClick={sendReport} disabled={reportText.trim().length < 3} className="mt-2 h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50">Send to Aime</button>
+                  <button type="button" onClick={sendReport} disabled={reportText.trim().length < 3} className="mt-2 h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50">{tr("Send to Aime")}</button>
                 </>
               ) : (
-                <p className="text-sm"><Link to="/auth" className="font-semibold text-primary underline">Sign in</Link> to report a problem, so Aime can reply to you.</p>
+                <p className="text-sm"><Link to="/auth" className="font-semibold text-primary underline">{tr("Sign in")}</Link> to report a problem, so Aime can reply to you.</p>
               )}
             </div>
           )}
@@ -339,10 +340,10 @@ export function PracticePanel(props: {
 function OfficialLinks({ section }: { section: Section }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 text-sm leading-relaxed">
-      <p className="font-semibold">Want official test questions too?</p>
-      <p className="mt-1 text-muted-foreground">These questions are written in the style of the Digital SAT. For questions by College Board, use their free tools:</p>
+      <p className="font-semibold">{tr("Want official test questions too?")}</p>
+      <p className="mt-1 text-muted-foreground">{tr("These questions are written in the style of the Digital SAT. For questions by College Board, use their free tools:")}</p>
       <ul className="mt-2 list-disc space-y-1 pl-5">
-        <li><a className="font-semibold text-primary underline" href="https://satsuitequestionbank.collegeboard.org" target="_blank" rel="noopener noreferrer">College Board Question Bank</a> (choose {section === "rw" ? "Reading and Writing" : "Math"})</li>
+        <li><a className="font-semibold text-primary underline" href="https://satsuitequestionbank.collegeboard.org" target="_blank" rel="noopener noreferrer">College Board Question Bank</a> (choose {section === "rw" ? tr("Reading and Writing") : tr("Math")})</li>
         <li><a className="font-semibold text-primary underline" href="https://bluebook.collegeboard.org" target="_blank" rel="noopener noreferrer">Bluebook full-length practice tests</a></li>
         <li><a className="font-semibold text-primary underline" href="https://www.khanacademy.org/test-prep/sat" target="_blank" rel="noopener noreferrer">Official Digital SAT Prep on Khan Academy</a></li>
       </ul>

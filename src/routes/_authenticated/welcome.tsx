@@ -4,6 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { tr } from "@/lib/i18n/tr";
 
 export const Route = createFileRoute("/_authenticated/welcome")({
   head: () => ({ meta: [{ title: "Welcome | Imboni SAT Hub" }, { name: "robots", content: "noindex" }] }),
@@ -48,9 +49,9 @@ function Welcome() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-6">
-      <div className="flex justify-between text-sm font-semibold text-muted-foreground"><span>Set up your plan · 1 minute</span><button type="button" onClick={() => save(true)}>Skip</button></div>
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">When is your SAT?</h1>
-      <p className="mt-1 text-muted-foreground">We use this to plan how much to study each day.</p>
+      <div className="flex justify-between text-sm font-semibold text-muted-foreground"><span>{tr("Set up your plan · 1 minute")}</span><button type="button" onClick={() => save(true)}>{tr("Skip")}</button></div>
+      <h1 className="mt-4 text-3xl font-bold tracking-tight">{tr("When is your SAT?")}</h1>
+      <p className="mt-1 text-muted-foreground">{tr("We use this to plan how much to study each day.")}</p>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {months.map((m) => (
           <button key={m.date} type="button" onClick={() => setDate(m.date)} className={cn("rounded-2xl border bg-card p-4 text-left", date === m.date ? "border-2 border-primary bg-secondary" : "border-border")}>
@@ -58,14 +59,14 @@ function Welcome() {
           </button>
         ))}
         <button type="button" onClick={() => setDate(null)} className={cn("rounded-2xl border bg-card p-4 text-left", date === null ? "border-2 border-primary bg-secondary" : "border-border")}>
-          <b className="block">Not booked yet</b><span className="text-sm text-muted-foreground">We plan 3 months</span>
+          <b className="block">{tr("Not booked yet")}</b><span className="text-sm text-muted-foreground">{tr("We plan 3 months")}</span>
         </button>
       </div>
-      <h2 className="mb-2 mt-6 font-bold">Your goal score</h2>
+      <h2 className="mb-2 mt-6 font-bold">{tr("Your goal score")}</h2>
       <div className="flex flex-wrap gap-2">{[1100, 1200, 1300, 1400, 1500].map((g) => <button key={g} type="button" onClick={() => setGoal(g)} className={chip(goal === g)}>{g === 1500 ? "1500+" : g}</button>)}</div>
-      <h2 className="mb-2 mt-6 font-bold">Time you have each day</h2>
+      <h2 className="mb-2 mt-6 font-bold">{tr("Time you have each day")}</h2>
       <div className="flex flex-wrap gap-2">{[15, 30, 60, 120].map((m) => <button key={m} type="button" onClick={() => setMinutes(m)} className={chip(minutes === m)}>{m < 60 ? `${m} min` : `${m / 60} hour${m > 60 ? "s" : ""}`}</button>)}</div>
-      <button type="button" onClick={() => save()} className="mt-8 h-12 w-full rounded-xl bg-primary font-bold text-primary-foreground">Next: 10-minute check</button>
+      <button type="button" onClick={() => save()} className="mt-8 h-12 w-full rounded-xl bg-primary font-bold text-primary-foreground">{tr("Next: 10-minute check")}</button>
     </div>
   );
 }

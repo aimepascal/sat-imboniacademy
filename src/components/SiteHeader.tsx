@@ -16,6 +16,7 @@ import { canReviewQuestions, useRoles } from "@/hooks/use-roles";
 import { LANGUAGES, setLanguage, useI18n, type Language } from "@/lib/i18n";
 import { learningDb } from "@/lib/learning/db";
 import logoUrl from "@/assets/logo.png";
+import { tr } from "@/lib/i18n/tr";
 
 // One compact bar (56px) on every page.
 // Main links: Learn, Practice, Library, Cheat codes, Community. On phones the same
@@ -80,26 +81,26 @@ export function SiteHeader() {
   );
 
   const mainLinks: { to: string; label: string }[] = [
-    { to: "/learn", label: "Learn" },
+    { to: "/learn", label: tr("Learn") },
     { to: "/practice", label: t("nav.practice") },
-    { to: "/library", label: "Library" },
-    { to: "/codes", label: "Cheat codes" },
-    { to: "/forum", label: "Community" },
+    { to: "/library", label: tr("Library") },
+    { to: "/codes", label: tr("Cheat codes") },
+    { to: "/forum", label: tr("Community") },
   ];
   const moreLinks: { to: string; label: string }[] = [
-    { to: "/codes", label: "Cheat codes" },
+    { to: "/codes", label: tr("Cheat codes") },
     { to: "/check", label: "10-minute check" },
-    { to: "/test", label: "Full practice test" },
-    { to: "/tutors", label: "Tutors and mentors" },
-    { to: "/impact", label: "Impact" },
+    { to: "/test", label: tr("Full practice test") },
+    { to: "/tutors", label: tr("Tutors and mentors") },
+    { to: "/impact", label: tr("Impact") },
   ];
 
   const accountLinks: { to: string; label: string }[] = [
-    { to: "/me", label: "My progress" },
-    { to: "/today", label: "Today's plan" },
+    { to: "/me", label: tr("My progress") },
+    { to: "/today", label: tr("Today's plan") },
     ...(canReviewQuestions(roles) ? [{ to: "/review-desk", label: t("nav.reviewDesk") }] : []),
-    ...(roles?.includes("teacher") || isAdmin ? [{ to: "/classes", label: "My classes" }] : []),
-    ...(isAdmin ? [{ to: "/admin", label: "Control Center" }] : []),
+    ...(roles?.includes("teacher") || isAdmin ? [{ to: "/classes", label: tr("My classes") }] : []),
+    ...(isAdmin ? [{ to: "/admin", label: tr("Control Center") }] : []),
   ];
 
   const initials = (email.split("@")[0] || "?").slice(0, 2).toUpperCase();
@@ -146,14 +147,14 @@ export function SiteHeader() {
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="text-destructive">
-                  Sign out
+                  {tr("Sign out")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <>
-              <Link to="/auth" className="px-2 text-sm font-medium hover:text-primary">Log in</Link>
-              <Button size="sm" asChild><Link to="/auth" search={{ mode: "signup" }}>Start free</Link></Button>
+              <Link to="/auth" className="px-2 text-sm font-medium hover:text-primary">{tr("Log in")}</Link>
+              <Button size="sm" asChild><Link to="/auth" search={{ mode: "signup" }}>{tr("Start free")}</Link></Button>
             </>
           )}
         </div>
@@ -185,11 +186,11 @@ export function SiteHeader() {
                 </Link>
               ))}
             {userId ? (
-              <Button variant="outline" className="mt-4 h-12" onClick={handleSignOut}>Sign out</Button>
+              <Button variant="outline" className="mt-4 h-12" onClick={handleSignOut}>{tr("Sign out")}</Button>
             ) : (
               <div className="mt-4 flex flex-col gap-2">
-                <Button asChild className="h-12"><Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)}>Start free</Link></Button>
-                <Button variant="outline" asChild className="h-12"><Link to="/auth" onClick={() => setOpen(false)}>Log in</Link></Button>
+                <Button asChild className="h-12"><Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)}>{tr("Start free")}</Link></Button>
+                <Button variant="outline" asChild className="h-12"><Link to="/auth" onClick={() => setOpen(false)}>{tr("Log in")}</Link></Button>
               </div>
             )}
           </nav>

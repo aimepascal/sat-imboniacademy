@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import type { PracticeQuestion, Section } from "@/lib/content";
 import { QuestionBody } from "@/components/learn/QuestionBody";
+import { tr } from "@/lib/i18n/tr";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
@@ -26,8 +27,8 @@ export const Route = createFileRoute("/test")({
 });
 
 const SPEC: Record<Section, { name: string; count: number; minutes: number }> = {
-  rw: { name: "Reading and Writing", count: 27, minutes: 32 },
-  m: { name: "Math", count: 22, minutes: 35 },
+  rw: { name: tr("Reading and Writing"), count: 27, minutes: 32 },
+  m: { name: tr("Math"), count: 22, minutes: 35 },
 };
 type Q = PracticeQuestion & { domain: string };
 interface Graded { question_id: string; choice: number; correct: boolean; answer: number; why: string }
@@ -127,20 +128,20 @@ function TestPage() {
   if (stage === "pick" || stage === "loading")
     return (
       <div className="mx-auto max-w-2xl px-4 py-8">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Full practice test</p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight">Test yourself like test day</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("Full practice test")}</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight">{tr("Test yourself like test day")}</h1>
         <p className="mt-2 text-muted-foreground">Two timed modules. If module 1 goes well, module 2 is harder and the score can go higher, just like the Digital SAT. Answers are checked at the end of each module.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {(Object.keys(SPEC) as Section[]).map((s) => (
             <button key={s} type="button" disabled={stage === "loading"} onClick={() => { setSection(s); setModule(1); setGraded({ m1: [], m2: [], q1: [], q2: [] }); void load(s, 1, true, []); }}
               className="rounded-2xl border border-border bg-card p-5 text-left hover:border-primary disabled:opacity-60">
-              <b className="block text-lg">{SPEC[s].name}</b>
+              <b className="block text-lg">{tr(SPEC[s].name)}</b>
               <span className="text-sm text-muted-foreground">2 modules × {SPEC[s].count} questions, {SPEC[s].minutes} minutes each</span>
             </button>
           ))}
         </div>
         <p className="mt-6 rounded-xl bg-secondary p-4 text-sm">The questions come from the Hub lessons, so you may have seen some. For the official experience, also take the free full tests in <a href="https://bluebook.collegeboard.org" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">Bluebook</a>.</p>
-        {!userId && <p className="mt-3 text-sm text-muted-foreground"><Link to="/auth" className="font-semibold text-primary underline">Sign in</Link> to save your score.</p>}
+        {!userId && <p className="mt-3 text-sm text-muted-foreground"><Link to="/auth" className="font-semibold text-primary underline">{tr("Sign in")}</Link> to save your score.</p>}
       </div>
     );
 
@@ -149,15 +150,15 @@ function TestPage() {
     const correct = all.filter((x) => x.g?.correct).length;
     return (
       <div className="mx-auto max-w-2xl px-4 py-8">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{SPEC[section].name} · result</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr(SPEC[section].name)} · result</p>
         <h1 className="mt-1 text-5xl font-bold tracking-tight">{score}</h1>
         <p className="mt-1 text-muted-foreground">Estimated section score out of 800 · {correct} of {all.length} right · module 2 was {harder ? "the harder one" : "the easier one"}</p>
         <p className="mt-3 text-xs text-muted-foreground">An estimate from Hub questions, not an official College Board score.</p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <button type="button" onClick={() => { setStage("pick"); setScore(null); }} className="h-11 rounded-xl bg-primary px-5 font-bold text-primary-foreground">Take another test</button>
-          {userId && <Link to="/me" className="h-11 rounded-xl border border-primary px-5 font-semibold leading-[44px] text-primary">My progress</Link>}
+          <button type="button" onClick={() => { setStage("pick"); setScore(null); }} className="h-11 rounded-xl bg-primary px-5 font-bold text-primary-foreground">{tr("Take another test")}</button>
+          {userId && <Link to="/me" className="h-11 rounded-xl border border-primary px-5 font-semibold leading-[44px] text-primary">{tr("My progress")}</Link>}
         </div>
-        <h2 className="mb-3 mt-8 text-xl font-bold">Check your answers</h2>
+        <h2 className="mb-3 mt-8 text-xl font-bold">{tr("Check your answers")}</h2>
         <div className="space-y-3">
           {all.map(({ q, g, n, m }) => (
             <details key={q.id} className={cn("rounded-xl border bg-card p-4", g?.correct ? "border-border" : "border-rose-200")}>
@@ -180,14 +181,14 @@ function TestPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-14 z-20 flex h-12 items-center gap-3 bg-foreground px-4 text-sm font-bold text-background">
-        <span>{SPEC[section].name} · Module {module}</span>
+        <span>{tr(SPEC[section].name)} · Module {module}</span>
         <span className="mx-auto font-mono text-base tabular-nums">{hideTimer ? "" : fmt(left)}</span>
         <button type="button" onClick={() => setHideTimer((v) => !v)} className="font-semibold">{hideTimer ? "Show" : "Hide"}</button>
       </div>
       <div className="flex gap-2 border-b border-border bg-card px-4 py-2 text-sm font-semibold text-primary">
-        {section === "m" && <a href="https://www.desmos.com/testing/cb-digital-sat/graphing" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1"><Calculator className="h-4 w-4" /> Calculator</a>}
-        {section === "m" && <button type="button" onClick={() => setRef(true)} className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1"><Sigma className="h-4 w-4" /> Reference</button>}
-        {stage === "run" && q && <button type="button" onClick={() => setMarked((m) => ({ ...m, [q.id]: !m[q.id] }))} className={cn("flex items-center gap-1 rounded-full px-3 py-1", marked[q.id] ? "bg-amber-100 text-amber-800" : "bg-secondary")}><Flag className="h-4 w-4" /> {marked[q.id] ? "Marked" : "Mark for review"}</button>}
+        {section === "m" && <a href="https://www.desmos.com/testing/cb-digital-sat/graphing" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1"><Calculator className="h-4 w-4" /> {tr("Calculator")}</a>}
+        {section === "m" && <button type="button" onClick={() => setRef(true)} className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1"><Sigma className="h-4 w-4" /> {tr("Reference")}</button>}
+        {stage === "run" && q && <button type="button" onClick={() => setMarked((m) => ({ ...m, [q.id]: !m[q.id] }))} className={cn("flex items-center gap-1 rounded-full px-3 py-1", marked[q.id] ? "bg-amber-100 text-amber-800" : "bg-secondary")}><Flag className="h-4 w-4" /> {marked[q.id] ? tr("Marked") : tr("Mark for review")}</button>}
       </div>
 
       <div className="mx-auto max-w-2xl px-4 pb-28 pt-5">
@@ -206,7 +207,7 @@ function TestPage() {
           </>
         ) : (
           <div>
-            <h2 className="text-xl font-bold">Check your work</h2>
+            <h2 className="text-xl font-bold">{tr("Check your work")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{answeredCount} of {qs.length} answered. Tap a number to go back to it. Unanswered questions count as wrong.</p>
           </div>
         )}
@@ -223,18 +224,18 @@ function TestPage() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t border-border bg-card p-3">
-        <button type="button" disabled={stage === "run" && i === 0} onClick={() => (stage === "check" ? setStage("run") : setI(i - 1))} className="h-11 flex-1 rounded-xl border border-primary font-semibold text-primary disabled:opacity-40">Back</button>
+        <button type="button" disabled={stage === "run" && i === 0} onClick={() => (stage === "check" ? setStage("run") : setI(i - 1))} className="h-11 flex-1 rounded-xl border border-primary font-semibold text-primary disabled:opacity-40">{tr("Back")}</button>
         {stage === "run" ? (
-          <button type="button" onClick={() => (i === qs.length - 1 ? setStage("check") : setI(i + 1))} className="h-11 flex-1 rounded-xl bg-primary font-bold text-primary-foreground">{i === qs.length - 1 ? "Check my work" : "Next"}</button>
+          <button type="button" onClick={() => (i === qs.length - 1 ? setStage("check") : setI(i + 1))} className="h-11 flex-1 rounded-xl bg-primary font-bold text-primary-foreground">{i === qs.length - 1 ? tr("Check my work") : tr("Next")}</button>
         ) : (
-          <button type="button" onClick={() => void submit()} className="h-11 flex-1 rounded-xl bg-primary font-bold text-primary-foreground">{module === 1 ? "Submit module 1" : "Finish the test"}</button>
+          <button type="button" onClick={() => void submit()} className="h-11 flex-1 rounded-xl bg-primary font-bold text-primary-foreground">{module === 1 ? tr("Submit module 1") : tr("Finish the test")}</button>
         )}
       </div>
 
       {ref && (
         <div role="dialog" aria-label="Reference sheet" className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => setRef(false)}>
           <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card p-5 text-sm leading-relaxed" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between"><b className="text-lg">Reference</b><button type="button" onClick={() => setRef(false)} aria-label="Close"><X className="h-5 w-5" /></button></div>
+            <div className="flex justify-between"><b className="text-lg">{tr("Reference")}</b><button type="button" onClick={() => setRef(false)} aria-label="Close"><X className="h-5 w-5" /></button></div>
             <ul className="mt-3 space-y-1.5">
               <li>Circle: A = πr², C = 2πr</li>
               <li>Rectangle: A = ℓw · Triangle: A = ½bh</li>
