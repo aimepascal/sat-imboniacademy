@@ -19,6 +19,7 @@ import {
 import { useProgress } from "@/lib/content/progress";
 import { PracticePanel } from "@/components/learn/PracticePanel";
 import { SatMapNav } from "@/components/learn/SatMapNav";
+import { tr } from "@/lib/i18n/tr";
 
 type Tab = "learn" | "practice" | "codes";
 const TABS: Tab[] = ["learn", "practice", "codes"];
@@ -63,7 +64,7 @@ function LessonPage() {
   const { data: lessons } = useSuspenseQuery(lessonIndexQuery);
   const { progress, update, isLoading: progressLoading } = useProgress(userId);
   const codesQ = useQuery({ ...universalCodesQuery, enabled: tab !== "learn" });
-  // Opening a lesson counts as starting it, so "Continue where you stopped" finds it.
+  // Opening a lesson counts as starting it, so tr("Continue where you stopped") finds it.
   useEffect(() => {
     // Wait for saved progress first, or this would overwrite it.
     if (lesson && !progressLoading && !progress[slug]) void update(slug, {});
@@ -105,16 +106,16 @@ function LessonPage() {
       <div className="min-w-0 flex-1">
         <div className="px-4 pb-2 pt-5 sm:px-8">
           <p className="text-[13px] text-muted-foreground">
-            <Link to="/learn" className="hover:underline">Learn</Link> / {part?.name} / {domain?.name}
+            <Link to="/learn" className="hover:underline">{tr("Learn")}</Link> / {tr(part?.name ?? "")} / {tr(domain?.name ?? "")}
             {parent && <> / <Link to="/learn/$slug" params={{ slug: parent.slug }} className="hover:underline">{parent.name}</Link></>}
           </p>
           <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight sm:text-4xl">{c.title || lesson.name}</h1>
         </div>
 
         <div className="sticky top-14 z-10 flex gap-6 border-b border-border bg-background/95 px-4 backdrop-blur sm:px-8">
-          {tabLink("learn", "Learn")}
-          {tabLink("practice", "Practice · 16")}
-          {tabLink("codes", `Cheat codes · ${c.codes.length}`)}
+          {tabLink("learn", tr("Learn"))}
+          {tabLink("practice", `${tr("Practice")} · 16`)}
+          {tabLink("codes", `${tr("Cheat codes")} · ${c.codes.length}`)}
         </div>
 
         <div className="max-w-3xl px-4 py-6 sm:px-8">
@@ -130,7 +131,7 @@ function LessonPage() {
 
           <div className="mt-10 flex flex-wrap justify-between gap-3 border-t border-border pt-6">
             {prev ? <Link to="/learn/$slug" params={{ slug: prev.slug }} className="h-10 rounded-lg border border-border px-4 font-semibold leading-10">← {prev.name}</Link> : <span />}
-            {next && <Link to="/learn/$slug" params={{ slug: next.slug }} className="h-10 rounded-lg bg-primary px-4 font-semibold leading-10 text-primary-foreground">Next: {next.name} →</Link>}
+            {next && <Link to="/learn/$slug" params={{ slug: next.slug }} className="h-10 rounded-lg bg-primary px-4 font-semibold leading-10 text-primary-foreground">{tr("Next: {name} →", { name: next.name })}</Link>}
           </div>
         </div>
       </div>
@@ -162,14 +163,14 @@ function LearnTab({ c, lesson, note, subLessons, done, onDone }: {
   return (
     <article className="text-[15.5px] leading-relaxed">
       <div className="rounded-2xl border border-primary/20 bg-secondary p-4">
-        <p className="text-xs font-bold uppercase tracking-wider text-primary">On the test</p>
+        <p className="text-xs font-bold uppercase tracking-wider text-primary">{tr("On the test")}</p>
         <p className="mt-1">{c.range}</p>
         {note && <p className="mt-2 text-sm text-muted-foreground">{note.qs}. {note.at}.</p>}
       </div>
 
       {subLessons.length > 0 && (
         <>
-          <H2>Parts of this skill</H2>
+          <H2>{tr("Parts of this skill")}</H2>
           <div className="grid gap-3 sm:grid-cols-3">
             {subLessons.map((k) => (
               <Link key={k.slug} to="/learn/$slug" params={{ slug: k.slug }} className="rounded-xl border border-border bg-card p-4 hover:border-primary">
@@ -181,14 +182,14 @@ function LearnTab({ c, lesson, note, subLessons, done, onDone }: {
         </>
       )}
 
-      <H2>How I approached it</H2>
+      <H2>{tr("How I approached it")}</H2>
       <div className="rounded-2xl border-l-4 border-primary bg-card p-4">
-        <p className="mb-1 text-xs font-bold uppercase tracking-wider text-primary">A small story from Aime</p>
+        <p className="mb-1 text-xs font-bold uppercase tracking-wider text-primary">{tr("A small story from Aime")}</p>
         <p>{c.story}</p>
       </div>
       <p className="mt-3 italic text-muted-foreground">{c.hope}</p>
 
-      <H2>What is inside this part</H2>
+      <H2>{tr("What is inside this part")}</H2>
       <div className="grid gap-3 sm:grid-cols-2">
         {c.subs.map((s) => (
           <div key={s.name} className="rounded-xl border border-border bg-card p-4">
@@ -199,13 +200,13 @@ function LearnTab({ c, lesson, note, subLessons, done, onDone }: {
         ))}
       </div>
 
-      <H2>How to know a question is from this part</H2>
+      <H2>{tr("How to know a question is from this part")}</H2>
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
         <p>{c.spot.t}</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">{c.spot.s.map((x) => <li key={x}>{x}</li>)}</ul>
       </div>
 
-      <H2>The lesson</H2>
+      <H2>{tr("The lesson")}</H2>
       <div className="space-y-4">
         {c.lesson.map((b, n) => (
           <section key={b.h} className="rounded-2xl border border-border bg-card p-5">
@@ -215,7 +216,7 @@ function LearnTab({ c, lesson, note, subLessons, done, onDone }: {
               <div className="mt-3 rounded-xl bg-secondary p-4">
                 <p className="font-semibold">{b.ex.q}</p>
                 <details className="mt-2">
-                  <summary className="cursor-pointer font-semibold text-primary">Show the steps</summary>
+                  <summary className="cursor-pointer font-semibold text-primary">{tr("Show the steps")}</summary>
                   <ol className="mt-2 list-decimal space-y-1 pl-5">{(b.ex.steps ?? []).map((s) => <li key={s}>{s}</li>)}</ol>
                   <p className="mt-2 font-bold">{b.ex.ans}</p>
                 </details>
@@ -227,25 +228,25 @@ function LearnTab({ c, lesson, note, subLessons, done, onDone }: {
 
       {c.visual.length > 0 && (
         <>
-          <H2>See it</H2>
+          <H2>{tr("See it")}</H2>
           <div className="space-y-4">{c.visual.map((v, i) => <VisualBlock key={i} v={v} />)}</div>
         </>
       )}
 
-      <H2>Videos that can help</H2>
-      {c.videos.length ? <div className="grid gap-4 sm:grid-cols-2">{c.videos.map((v) => <VideoCard key={v.id} {...v} />)}</div> : <p>Videos are coming.</p>}
+      <H2>{tr("Videos that can help")}</H2>
+      {c.videos.length ? <div className="grid gap-4 sm:grid-cols-2">{c.videos.map((v) => <VideoCard key={v.id} {...v} />)}</div> : <p>{tr("Videos are coming.")}</p>}
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/learn/$slug" params={{ slug: lesson.slug }} search={{ tab: "practice" }} className="h-11 rounded-xl bg-primary px-5 font-bold leading-[44px] text-primary-foreground">Practise this part →</Link>
+        <Link to="/learn/$slug" params={{ slug: lesson.slug }} search={{ tab: "practice" }} className="h-11 rounded-xl bg-primary px-5 font-bold leading-[44px] text-primary-foreground">{tr("Practise this part →")}</Link>
         <button type="button" onClick={onDone} className={cn("h-11 rounded-xl border px-5 font-semibold", done ? "border-emerald-600 bg-emerald-50 text-emerald-800" : "border-primary text-primary")}>
-          {done ? "✓ Marked as done" : "Mark as done"}
+          {done ? "✓ Marked as done" : tr("Mark as done")}
         </button>
       </div>
 
       <div className="mt-8 rounded-2xl border border-border bg-card p-5">
-        <b>Need help with this part?</b>
-        <p className="mt-1 text-sm text-muted-foreground">Ask in the community. Tutors and other students answer.</p>
-        <a href={`/forum?lesson=${lesson.slug}`} className="mt-3 inline-block h-10 rounded-lg border border-primary px-4 font-semibold leading-10 text-primary">Ask a question</a>
+        <b>{tr("Need help with this part?")}</b>
+        <p className="mt-1 text-sm text-muted-foreground">{tr("Ask in the community. Tutors and other students answer.")}</p>
+        <a href={`/forum?lesson=${lesson.slug}`} className="mt-3 inline-block h-10 rounded-lg border border-primary px-4 font-semibold leading-10 text-primary">{tr("Ask a question")}</a>
       </div>
     </article>
   );
@@ -304,7 +305,7 @@ function VideoCard({ id, title, channel }: { id: string; title: string; channel:
       </div>
       <div className="p-3 text-sm">
         <b className="block">{title}</b>
-        <span className="text-muted-foreground">{channel} · <a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer" className="underline">Open on YouTube</a></span>
+        <span className="text-muted-foreground">{channel} · <a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer" className="underline">{tr("Open on YouTube")}</a></span>
       </div>
     </div>
   );
@@ -313,24 +314,24 @@ function VideoCard({ id, title, channel }: { id: string; title: string; channel:
 function CodesTab({ c, slug, universal }: { c: LessonContent; slug: string; universal: { id: string; name: string; oneline: string; apply: { skill: string; q: number }[] }[] }) {
   return (
     <div className="space-y-3">
-      <p className="text-muted-foreground">I worked these out from the practice questions. Each code says where to start reading, where to stop, what you can skip, and why it is safe.</p>
+      <p className="text-muted-foreground">{tr("I worked these out from the practice questions. Each code says where to start reading, where to stop, what you can skip, and why it is safe.")}</p>
       {c.codes.map((k, n) => (
         <div key={k.t} className="rounded-2xl border border-border bg-card p-5 text-[15px] leading-relaxed">
           <h3 className="text-lg font-bold">{n + 1}. {k.t}</h3>
           <dl className="mt-2 space-y-1.5">
-            <div><dt className="inline font-bold text-primary">Start: </dt><dd className="inline">{k.start}</dd></div>
-            <div><dt className="inline font-bold text-primary">Stop: </dt><dd className="inline">{k.stop}</dd></div>
-            <div><dt className="inline font-bold text-primary">Skip: </dt><dd className="inline">{k.skip}</dd></div>
-            <div><dt className="inline font-bold text-primary">Why: </dt><dd className="inline">{k.why}</dd></div>
+            <div><dt className="inline font-bold text-primary">{tr("Start:")} </dt><dd className="inline">{k.start}</dd></div>
+            <div><dt className="inline font-bold text-primary">{tr("Stop:")} </dt><dd className="inline">{k.stop}</dd></div>
+            <div><dt className="inline font-bold text-primary">{tr("Skip:")} </dt><dd className="inline">{k.skip}</dd></div>
+            <div><dt className="inline font-bold text-primary">{tr("Why:")} </dt><dd className="inline">{k.why}</dd></div>
           </dl>
           {k.from?.length ? <p className="mt-2 text-sm text-muted-foreground">Used in question{k.from.length > 1 ? "s" : ""} {k.from.join(", ")}</p> : null}
         </div>
       ))}
-      <Link to="/learn/$slug" params={{ slug }} search={{ tab: "practice" }} className="block h-11 rounded-xl border border-primary text-center font-bold leading-[44px] text-primary">Try these codes on the questions</Link>
+      <Link to="/learn/$slug" params={{ slug }} search={{ tab: "practice" }} className="block h-11 rounded-xl border border-primary text-center font-bold leading-[44px] text-primary">{tr("Try these codes on the questions")}</Link>
 
       {universal.length > 0 && (
         <>
-          <h2 className="pt-6 text-xl font-bold">Cheat codes that work in every part</h2>
+          <h2 className="pt-6 text-xl font-bold">{tr("Cheat codes that work in every part")}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {universal.map((u) => {
               const here = u.apply.filter((a) => a.skill === slug).map((a) => a.q);

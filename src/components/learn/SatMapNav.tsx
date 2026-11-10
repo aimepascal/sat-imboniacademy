@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import type { LessonSummary, SatPart } from "@/lib/content";
 import type { ProgressMap } from "@/lib/content/progress";
+import { tr } from "@/lib/i18n/tr";
 
 /** The SAT map as a list: parts, domains and lessons, with done / started dots. */
 export function SatMapNav({ map, lessons, progress, current }: {
@@ -14,10 +15,10 @@ export function SatMapNav({ map, lessons, progress, current }: {
   const openDomain = currentLesson?.domain_slug;
   return (
     <nav aria-label="SAT map" className="text-sm">
-      <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-primary">SAT map</p>
+      <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-primary">{tr("SAT map")}</p>
       {map.map((part) => (
         <div key={part.id} className="mb-4">
-          <p className="mb-1.5 font-bold">{part.name}</p>
+          <p className="mb-1.5 font-bold">{tr(part.name)}</p>
           {part.domains.map((d) => {
             const list = lessons.filter((l) => l.domain_slug === d.id);
             const done = list.filter((l) => progress[l.slug]?.done).length;
@@ -26,7 +27,7 @@ export function SatMapNav({ map, lessons, progress, current }: {
               <details key={d.id} open={d.id === openDomain} className="group">
                 <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-1.5 text-foreground/80 hover:bg-secondary">
                   <span className={cn("h-2 w-2 flex-none rounded-full", done === list.length && list.length ? "bg-emerald-600" : started ? "bg-amber-500" : "bg-border")} />
-                  <span className="flex-1">{d.name}</span>
+                  <span className="flex-1">{tr(d.name)}</span>
                   <span className="text-xs text-muted-foreground">{done}/{list.length}</span>
                 </summary>
                 <div className="mb-1 ml-4 border-l border-border pl-2">

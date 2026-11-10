@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { tr } from "@/lib/i18n/tr";
 
 // A short notice that the Hub counts visits. Shown once per browser.
 const KEY = "imboni_privacy_ok";
@@ -34,14 +35,14 @@ export function PrivacyNotice() {
     >
       <p className="m-0 leading-snug">
         We count visits to improve the Hub. No ads, and we never sell your data.{" "}
-        <Link to="/privacy" className="font-semibold text-white underline">Privacy</Link>
+        <Link to="/privacy" className="font-semibold text-white underline">{tr("Privacy")}</Link>
       </p>
       <button
         type="button"
         onClick={accept}
         className="h-9 shrink-0 rounded-lg bg-white px-4 font-bold text-secondary-foreground"
       >
-        OK
+        {tr("OK")}
       </button>
     </div>
   );

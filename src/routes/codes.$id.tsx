@@ -4,6 +4,7 @@ import { useQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { checkAnswer, lessonIndexQuery, lessonQuestionsQuery, universalCodesQuery, type PracticeQuestion } from "@/lib/content";
 import { QuestionBody } from "@/components/learn/QuestionBody";
+import { tr } from "@/lib/i18n/tr";
 
 export const Route = createFileRoute("/codes/$id")({
   loader: async ({ context, params }) => {
@@ -37,25 +38,25 @@ function CodePage() {
   const qs = useQueries({ queries: skills.map((s) => lessonQuestionsQuery(s)) });
   const findQ = (skill: string, pos: number): PracticeQuestion | undefined =>
     qs[skills.indexOf(skill)]?.data?.find((q) => q.position === pos);
-  const scope = u.applies === "all" ? "Every part" : u.applies === "rw" ? "Reading and Writing" : "Math";
+  const scope = u.applies === "all" ? "Every part" : u.applies === "rw" ? tr("Reading and Writing") : tr("Math");
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 text-[15.5px] leading-relaxed sm:px-6">
-      <p className="text-[13px] text-muted-foreground"><Link to="/codes" className="hover:underline">Cheat codes</Link> / {scope}</p>
+      <p className="text-[13px] text-muted-foreground"><Link to="/codes" className="hover:underline">{tr("Cheat codes")}</Link> / {scope}</p>
       <h1 className="mt-1 text-3xl font-bold tracking-tight">{u.name}</h1>
       <p className="mt-3 rounded-2xl border border-primary/20 bg-secondary p-4 font-semibold">{u.oneline}</p>
 
-      <h2 className="mb-3 mt-8 text-xl font-bold">How I think about it</h2>
+      <h2 className="mb-3 mt-8 text-xl font-bold">{tr("How I think about it")}</h2>
       <div className="rounded-2xl border-l-4 border-primary bg-card p-4">{u.story}</div>
 
-      <h2 className="mb-3 mt-8 text-xl font-bold">The code in steps</h2>
+      <h2 className="mb-3 mt-8 text-xl font-bold">{tr("The code in steps")}</h2>
       <ol className="space-y-2 rounded-2xl border border-border bg-card p-4">
         {u.steps.map((s, i) => (
           <li key={i} className="flex gap-3"><span className="grid h-6 w-6 flex-none place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{i + 1}</span>{s}</li>
         ))}
       </ol>
 
-      <h2 className="mb-3 mt-8 text-xl font-bold">Learn it</h2>
+      <h2 className="mb-3 mt-8 text-xl font-bold">{tr("Learn it")}</h2>
       <div className="space-y-3">
         {u.teach.map((b, i) => (
           <section key={i} className="rounded-2xl border border-border bg-card p-4">
@@ -65,12 +66,12 @@ function CodePage() {
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-xl font-bold">Why it works</h2>
+      <h2 className="mb-3 mt-8 text-xl font-bold">{tr("Why it works")}</h2>
       <p>{u.why}</p>
-      <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><b>Watch out:</b> {u.watch}</p>
+      <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><b>{tr("Watch out:")}</b> {u.watch}</p>
 
-      <h2 className="mb-1 mt-8 text-xl font-bold">See it work on real questions</h2>
-      <p className="mb-3 text-muted-foreground">Try each question your usual way first. Then open the box to see the code at work.</p>
+      <h2 className="mb-1 mt-8 text-xl font-bold">{tr("See it work on real questions")}</h2>
+      <p className="mb-3 text-muted-foreground">{tr("Try each question your usual way first. Then open the box to see the code at work.")}</p>
       <div className="space-y-4">
         {u.apply.map((a, i) => {
           const q = findQ(a.skill, a.q);
@@ -92,7 +93,7 @@ function CodePage() {
         })}
       </div>
 
-      <h2 className="mb-3 mt-8 text-xl font-bold">Do not just believe me. Test it.</h2>
+      <h2 className="mb-3 mt-8 text-xl font-bold">{tr("Do not just believe me. Test it.")}</h2>
       <p className="rounded-2xl bg-secondary p-4">{u.experiment}</p>
 
       <div className="mt-8 flex flex-wrap justify-between gap-3 border-t border-border pt-6">
@@ -107,13 +108,13 @@ function Worked({ q, a }: { q: PracticeQuestion; a: { skill: string; without: st
   const [answer, setAnswer] = useState<number | null>(null);
   return (
     <details className="mt-3" onToggle={(e) => { if ((e.target as HTMLDetailsElement).open && answer === null) void checkAnswer(q.id, 0).then((r) => setAnswer(r.answer)).catch(() => undefined); }}>
-      <summary className="cursor-pointer font-bold text-primary">Show how the code solves it</summary>
+      <summary className="cursor-pointer font-bold text-primary">{tr("Show how the code solves it")}</summary>
       <div className="mt-2 space-y-2 rounded-xl bg-secondary p-4 text-[15px]">
-        <p><b>Without the code:</b> {a.without}</p>
-        <p><b>With the code:</b> {a.with}</p>
+        <p><b>{tr("Without the code:")}</b> {a.without}</p>
+        <p><b>{tr("With the code:")}</b> {a.with}</p>
         {answer !== null && <p><b>Answer: {String.fromCharCode(65 + answer)}.</b> {q.options[answer]}</p>}
-        <p><b>What changed:</b> {a.result}</p>
-        <Link to="/learn/$slug" params={{ slug: a.skill }} search={{ tab: "practice" }} className="inline-block font-semibold text-primary underline">Open this lesson and practise</Link>
+        <p><b>{tr("What changed:")}</b> {a.result}</p>
+        <Link to="/learn/$slug" params={{ slug: a.skill }} search={{ tab: "practice" }} className="inline-block font-semibold text-primary underline">{tr("Open this lesson and practise")}</Link>
       </div>
     </details>
   );
