@@ -25,7 +25,7 @@ const TAB_LABEL: Record<Tab, string> = {
   overview: "Overview",
   lessons: "Lessons",
   reports: "Reports from students",
-  resources: "Library guides",
+  resources: "Cheat codes",
   users: "Users & Roles",
   ai: "Writing helper",
 };
@@ -33,6 +33,11 @@ const TAB_LABEL: Record<Tab, string> = {
 function AdminPage() {
   const { user } = Route.useRouteContext();
   const { data: isAdmin, isLoading } = useIsAdmin(user.id);
+  const { data: me } = useQuery({
+    queryKey: ["display-name", user.id],
+    queryFn: async () => (await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle()).data?.display_name ?? "",
+  });
+  const firstName = me && !me.includes("@") ? me.split(" ")[0] : "";
   const [tab, setTab] = useState<Tab>("overview");
 
   if (isLoading) {
@@ -56,7 +61,7 @@ function AdminPage() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Control Center</h1>
-        <p className="mt-2 text-muted-foreground">Visitors, students and content for Imboni SAT Hub.</p>
+        <p className="mt-2 text-muted-foreground">{firstName ? `Welcome back, ${firstName}. ` : ""}Visitors, students and content for Imboni SAT Hub.</p>
       </div>
 
       <div className="mt-8 flex gap-1 rounded-lg border border-border bg-surface p-1 w-fit flex-wrap">
@@ -64,7 +69,7 @@ function AdminPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition ${tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition ${tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
             {TAB_LABEL[t]}
           </button>
@@ -76,7 +81,7 @@ function AdminPage() {
         {tab === "lessons" && <LessonsAdmin userId={user.id} />}
         {tab === "reports" && <ReportsAdmin />}
         {tab === "resources" && <ResourcesAdmin authorId={user.id} />}
-        {tab === "users" && <UsersAudit />}
+        {tab === "users" && <UsersAudit myId={user.id} />}
         {tab === "ai" && <AiCopilot authorId={user.id} />}
       </div>
     </div>
@@ -178,16 +183,27 @@ function Overview() {
             {data.per_day.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">No visits recorded yet in this period.</p>
             ) : (
-              <div className="mt-4 flex h-48 items-end gap-1 border-b border-border" role="img" aria-label="Bar chart of visits per day">
-                {data.per_day.map((d) => (
-                  <div
-                    key={d.day}
-                    title={`${d.day}: ${d.visits} visits`}
-                    className="min-w-[4px] flex-1 rounded-t bg-primary/70 hover:bg-primary"
-                    style={{ height: `${Math.max(2, Math.round((d.visits / max) * 100))}%` }}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="mt-4 flex h-48 items-end gap-1 border-b border-border" role="img" aria-label="Bar chart of visits per day">
+                  {data.per_day.map((d) => (
+                    <div key={d.day} className="group relative flex h-full min-w-[4px] flex-1 items-end">
+                      <div
+                        title={`${fmtDay(d.day)}: ${d.visits} visits`}
+                        className="w-full rounded-t bg-primary/70 group-hover:bg-primary"
+                        style={{ height: `${Math.max(2, Math.round((d.visits / max) * 100))}%` }}
+                      />
+                      {data.per_day.length <= 14 && (
+                        <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold text-muted-foreground">{d.visits}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-1.5 flex justify-between text-xs text-muted-foreground">
+                  <span>{fmtDay(data.per_day[0].day)}</span>
+                  <span>Busiest day: {max} visits</span>
+                  <span>{fmtDay(data.per_day[data.per_day.length - 1].day)}</span>
+                </div>
+              </>
             )}
           </div>
 
@@ -201,6 +217,8 @@ function Overview() {
     </div>
   );
 }
+
+const fmtDay = (d: string) => new Date(d + (d.length === 10 ? "T00:00:00" : "")).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 
 function StatList({ title, rows }: { title: string; rows: { name: string; n: number }[] }) {
   return (
@@ -564,9 +582,17 @@ function ForumPostPreview({ draft }: { draft: ForumPostDraft }) {
   );
 }
 
-/* -------------------- USERS AUDIT -------------------- */
+/* -------------------- USERS & ROLES -------------------- */
 
-function UsersAudit() {
+const ROLE_INFO: { role: "teacher" | "reviewer" | "admin"; label: string; help: string }[] = [
+  { role: "teacher", label: "Teacher", help: "Can make classes and give assignments" },
+  { role: "reviewer", label: "Reviewer", help: "Can check and approve questions" },
+  { role: "admin", label: "Admin", help: "Full access to the Control Center" },
+];
+
+function UsersAudit({ myId }: { myId: string }) {
+  const qc = useQueryClient();
+  const [q, setQ] = useState("");
   const { data: profiles = [] } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
@@ -593,27 +619,59 @@ function UsersAudit() {
     rolesByUser.set(r.user_id, list);
   }
 
-  const admins = profiles.filter((p) => rolesByUser.get(p.id)?.includes("admin")).length;
+  const toggle = useMutation({
+    mutationFn: async ({ userId, role, on }: { userId: string; role: string; on: boolean }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const t = supabase.from("user_roles") as any;
+      const { error } = on ? await t.insert({ user_id: userId, role }) : await t.delete().eq("user_id", userId).eq("role", role);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      toast.success(v.on ? `Added ${v.role}` : `Removed ${v.role}`);
+      qc.invalidateQueries({ queryKey: ["admin-user-roles"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const flip = (userId: string, name: string, role: string, on: boolean) => {
+    if (userId === myId && role === "admin" && !on) return toast.error("You cannot remove your own admin access.");
+    const msg = on ? `Give ${name} the ${role} role?` : `Remove the ${role} role from ${name}?`;
+    if (role === "admin" && !confirm(msg)) return;
+    toggle.mutate({ userId, role, on });
+  };
+
+  const count = (role: string) => profiles.filter((p) => rolesByUser.get(p.id)?.includes(role)).length;
+  const shown = profiles
+    .filter((p) => (p.display_name ?? "").toLowerCase().includes(q.trim().toLowerCase()))
+    .sort((a, b) => Number(rolesByUser.get(b.id)?.includes("admin") ?? false) - Number(rolesByUser.get(a.id)?.includes("admin") ?? false));
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-6 text-sm text-muted-foreground">
-        <span><strong className="text-foreground">{profiles.length}</strong> users</span>
-        <span><strong className="text-foreground">{admins}</strong> admin{admins === 1 ? "" : "s"}</span>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-5 text-sm text-muted-foreground">
+          <span><strong className="text-foreground">{profiles.length}</strong> users</span>
+          <span><strong className="text-foreground">{count("admin")}</strong> admin{count("admin") === 1 ? "" : "s"}</span>
+          <span><strong className="text-foreground">{count("teacher")}</strong> teacher{count("teacher") === 1 ? "" : "s"}</span>
+          <span><strong className="text-foreground">{count("reviewer")}</strong> reviewer{count("reviewer") === 1 ? "" : "s"}</span>
+        </div>
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name" className="w-56" />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3">User</th>
-              <th className="px-4 py-3">Roles</th>
+              {ROLE_INFO.map((r) => (
+                <th key={r.role} className="px-3 py-3 text-center" title={r.help}>{r.label}</th>
+              ))}
               <th className="px-4 py-3">Joined</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {profiles.map((p) => {
+            {shown.map((p) => {
               const userRoles = rolesByUser.get(p.id) ?? [];
+              const name = p.display_name ?? "this user";
               return (
                 <tr key={p.id}>
                   <td className="px-4 py-3">
@@ -626,33 +684,31 @@ function UsersAudit() {
                         </div>
                       )}
                       <div>
-                        <div className="font-medium">{p.display_name ?? "Unnamed"}</div>
-                        <div className="text-xs text-muted-foreground">{p.id.slice(0, 8)}…</div>
+                        <div className="font-medium">
+                          {p.display_name ?? "Unnamed"}
+                          {p.id === myId && <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-primary">You</span>}
+                        </div>
+                        <div className="text-xs text-muted-foreground">{userRoles.length ? userRoles.join(", ") : "student"}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    {userRoles.length === 0 ? (
-                      <span className="text-xs text-muted-foreground">student</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {userRoles.map((r) => (
-                          <span
-                            key={r}
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                              r === "admin"
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-primary-soft text-primary"
-                            }`}
-                          >
-                            {r}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </td>
+                  {ROLE_INFO.map((r) => {
+                    const on = userRoles.includes(r.role);
+                    return (
+                      <td key={r.role} className="px-3 py-3 text-center">
+                        <input
+                          type="checkbox"
+                          aria-label={`${r.label} role for ${name}`}
+                          className="h-4 w-4 accent-[hsl(var(--primary))]"
+                          checked={on}
+                          disabled={toggle.isPending || (p.id === myId && r.role === "admin")}
+                          onChange={() => flip(p.id, name, r.role, !on)}
+                        />
+                      </td>
+                    );
+                  })}
                   <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {new Date(p.created_at).toLocaleDateString()}
+                    {new Date(p.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                   </td>
                 </tr>
               );
@@ -662,7 +718,7 @@ function UsersAudit() {
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        Read-only audit. To grant or revoke admin access, ask in chat.
+        Tick a box to give a role, untick to take it away. Everyone without a role is a student. Every change is saved in the audit log.
       </p>
     </div>
   );
