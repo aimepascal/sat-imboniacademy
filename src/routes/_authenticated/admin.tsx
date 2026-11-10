@@ -132,7 +132,19 @@ function Overview() {
         { label: "Questions answered", value: data.answered, sub: "In practice" },
       ]
     : [];
-  const max = Math.max(1, ...(data?.per_day ?? []).map((d) => d.visits));
+  // Fill in days with no visits so the bars line up with the calendar.
+  const series = (() => {
+    const byDay = new Map((data?.per_day ?? []).map((d) => [String(d.day).slice(0, 10), d.visits]));
+    const out: { day: string; visits: number }[] = [];
+    const today = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+      const t = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+      const k = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+      out.push({ day: k, visits: byDay.get(k) ?? 0 });
+    }
+    return out;
+  })();
+  const max = Math.max(1, ...series.map((d) => d.visits));
 
   return (
     <div className="space-y-5">
@@ -184,25 +196,31 @@ function Overview() {
               <p className="mt-3 text-sm text-muted-foreground">No visits recorded yet in this period.</p>
             ) : (
               <>
-                <div className="mt-4 flex h-48 items-end gap-1 border-b border-border" role="img" aria-label="Bar chart of visits per day">
-                  {data.per_day.map((d) => (
-                    <div key={d.day} className="group relative flex h-full min-w-[4px] flex-1 items-end">
-                      <div
-                        title={`${fmtDay(d.day)}: ${d.visits} visits`}
-                        className="w-full rounded-t bg-primary/70 group-hover:bg-primary"
-                        style={{ height: `${Math.max(2, Math.round((d.visits / max) * 100))}%` }}
-                      />
-                      {data.per_day.length <= 14 && (
+                <div className="mt-6 flex h-48 items-end gap-1 border-b border-border" role="img" aria-label="Bar chart of visits per day">
+                  {series.map((d) => (
+                    <div
+                      key={d.day}
+                      title={`${fmtDay(d.day)}: ${d.visits} visits`}
+                      className="relative min-w-[3px] flex-1 rounded-t bg-primary/70 hover:bg-primary"
+                      style={{ height: `${d.visits ? Math.max(3, Math.round((d.visits / max) * 100)) : 1}%` }}
+                    >
+                      {series.length <= 14 && d.visits > 0 && (
                         <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold text-muted-foreground">{d.visits}</span>
                       )}
                     </div>
                   ))}
                 </div>
-                <div className="mt-1.5 flex justify-between text-xs text-muted-foreground">
-                  <span>{fmtDay(data.per_day[0].day)}</span>
-                  <span>Busiest day: {max} visits</span>
-                  <span>{fmtDay(data.per_day[data.per_day.length - 1].day)}</span>
-                </div>
+                {series.length <= 14 ? (
+                  <div className="mt-1.5 flex gap-1 text-[11px] text-muted-foreground">
+                    {series.map((d) => <span key={d.day} className="flex-1 text-center">{fmtDay(d.day)}</span>)}
+                  </div>
+                ) : (
+                  <div className="mt-1.5 flex justify-between text-xs text-muted-foreground">
+                    <span>{fmtDay(series[0].day)}</span>
+                    <span>Busiest day: {max} visits</span>
+                    <span>{fmtDay(series[series.length - 1].day)}</span>
+                  </div>
+                )}
               </>
             )}
           </div>
